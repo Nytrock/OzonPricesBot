@@ -1,0 +1,4 @@
+.venv
+.env
+bd.sqlite3
+.idea
