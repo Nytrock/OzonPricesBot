@@ -1,4 +1,4 @@
 .venv
 .env
-bd.sqlite3
+database/bd.sqlite3
 .idea
