@@ -1,7 +1,7 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 
-from enums.user_role import UserRole
+from enums.user_data import UserRole
 
 
 class IsUserAdmin(BaseFilter):

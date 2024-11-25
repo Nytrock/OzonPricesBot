@@ -1,4 +1,21 @@
 LEXICON_RU: dict[str, str] = {
     '/start': '',
     '/help': '',
+    'registration-start': 'Для начала работы с ботом нужно зарегистрироваться. Это нужно для персонализации результатов. '
+                    '\n Для старта регистрации вызовите команду /registrate',
+    'registration-error': 'Вы не зарегистрированы. \n Для старта регистрации вызовите команду /registrate',
+    'registration-command': 'Приветствую в системе регистрации. Ответьте на несколько простых вопросов',
+    'registration-card': 'У вас есть Ozon карта?',
+    'registration-card-error': 'Ошибка. Ответьте на вопрос "да" или "нет"',
+    'registration-variation': 'Показывать ли вариации товара на его страничке?',
+    'registration-variation-only-cheap': 'Только более дешёвые',
+    'registration-variation-error': 'Ошибка. Ответьте на вопрос "да", "нет" или "только более дешёвые"',
+    'registration-image': 'Показывать ли изображение товара на его страничке?',
+    'registration-image-error': 'Ошибка. Ответьте на вопрос "да" или "нет"',
+    'registration-notifications': 'Присылать ли вам уведомлении при изменении цены на товар из избранного?',
+    'registration-notifications-only-lowering': 'Только при понижении цены',
+    'registration-notifications-error': 'Ошибка. Ответьте на вопрос "да", "нет" или "только про понижения цены"',
+    'registration-finish': 'Регистрация успешно завершена!',
+    'yes': 'Да',
+    'no': 'Нет',
 }

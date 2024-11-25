@@ -4,7 +4,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, User
 
 from database.methods import get_user
-from enums.user_role import UserRole
+from enums.user_data import UserRole
 
 
 class UserRoleMiddleware(BaseMiddleware):

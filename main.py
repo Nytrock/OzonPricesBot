@@ -5,7 +5,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from config_data.config import Config, load_config
 from database.methods import create_tables
-from handlers import registration, admin_panel, commands, favorites, products, settings
+from handlers import registration, admin_panel, main_menu, favorites, products, settings
 from lexicon.lexicon import LEXICON
 from middlewares.i18n import TranslatorMiddleware
 from middlewares.user_role import UserRoleMiddleware
@@ -21,16 +21,18 @@ async def main():
     await create_tables()
 
     dp.include_router(registration.router)
+    dp.include_router(main_menu.router)
     dp.include_router(admin_panel.router)
-    dp.include_router(commands.router)
-    dp.include_router(favorites.router)
     dp.include_router(settings.router)
+    dp.include_router(favorites.router)
     dp.include_router(products.router)
 
-    dp.update.outer_middleware(UserRoleMiddleware)
+    dp.update.outer_middleware(UserRoleMiddleware())
+    dp.update.middleware(TranslatorMiddleware())
 
     dp['translations'] = LEXICON
 
+    await bot.delete_webhook()
     await dp.start_polling(bot)
 
 

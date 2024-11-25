@@ -15,11 +15,14 @@ class User(Base):
     id: Mapped[pk]
     is_admin: Mapped[bool] = mapped_column(default=False)
     have_card: Mapped[bool]
-    show_variations: Mapped[bool]
+    show_variations: Mapped[int]
     show_product_image: Mapped[bool]
-    send_notifications: Mapped[bool]
+    send_notifications: Mapped[int]
 
-    favorite_products = relationship('Product', secondary='favorite', back_populates='user')
+    favorite_products: Mapped[list['Product']] = relationship(
+        secondary='favorite',
+        back_populates='users_favorite'
+    )
 
 
 class Product(Base):
@@ -29,7 +32,10 @@ class Product(Base):
     name: Mapped[str] = mapped_column(String(200))
     rating: Mapped[float]
 
-    users_favorite = relationship('User', secondary='favorite', back_populates='user')
+    users_favorite: Mapped[list['User']] = relationship(
+        secondary='favorite',
+        back_populates='favorite_products'
+    )
 
 
 class Price(Base):
