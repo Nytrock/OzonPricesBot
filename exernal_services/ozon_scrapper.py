@@ -1,4 +1,5 @@
 import json
+from pprint import pprint
 
 from bs4 import BeautifulSoup
 from typing import Any
@@ -58,21 +59,24 @@ def get_product_info_by_id(product_id: int) -> dict[str, Any]:
     result |= get_product_prices_from_soup(product_soup)
 
     if result.get('is_not_exists'):
-        result = {'regular_price': -1, 'card_price': -1, 'title': '', 'rating': 0, 'image': '', 'variations': []}
+        result = {'regular_price': -1, 'card_price': -1, 'title': '', 'brand': '',
+                  'rating': 0, 'rating_count': 0, 'image': '', 'description': '', 'variations': []}
         return result
 
-    title_div = product_soup.find(attrs={'data-widget': 'webProductHeading'})
-    result['title'] = title_div.get_text().strip()
+    info_div = product_soup.find('script', attrs={'type': 'application/ld+json'})
+    product_info = json.loads(info_div.text)
 
-    rating_div = product_soup.find(attrs={'data-widget': 'webSingleProductScore'})
-    if rating_div is None or '•' not in rating_div.get_text():
+    if product_info.get('aggregateRating') is None:
         result['rating'] = 0
+        result['rating_count'] = 0
     else:
-        result['rating'] = float(rating_div.get_text().split('•')[0])
+        result['rating'] = product_info['aggregateRating']['ratingValue']
+        result['rating_count'] = product_info['aggregateRating']['reviewCount']
 
-
-    image = product_soup.head.find('link', attrs={'as': 'image'})
-    result['image'] = image['href']
+    result['brand'] = product_info['brand']
+    result['title'] = product_info['name']
+    result['image'] = product_info['image']
+    result['description'] = product_info['description']
 
     variants_div = product_soup.find(id='state-webAspects-3529295-default-1')
     if variants_div is None:

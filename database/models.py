@@ -29,8 +29,13 @@ class Product(Base):
     __tablename__ = 'product'
 
     id: Mapped[pk]
-    name: Mapped[str] = mapped_column(String(200))
+    title: Mapped[str] = mapped_column(String(200))
     rating: Mapped[float]
+    rating_count: Mapped[int]
+    brand: Mapped[int] = mapped_column(ForeignKey('brand.id', ondelete='CASCADE'))
+    description: Mapped[str]
+    image: Mapped[str]
+    product_group: Mapped[int] = mapped_column(ForeignKey('product_group.id', ondelete='CASCADE'))
 
     users_favorite: Mapped[list['User']] = relationship(
         secondary='favorite',
@@ -54,3 +59,15 @@ class Favorite(Base):
     id: Mapped[pk]
     user: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'))
     product: Mapped[int] = mapped_column(ForeignKey('product.id', ondelete='CASCADE'))
+
+
+class ProductGroup(Base):
+    __tablename__ = 'product_group'
+
+    id: Mapped[pk]
+
+class Brand(Base):
+    __tablename__ = 'brand'
+
+    id: Mapped[pk]
+    name: Mapped[str]
