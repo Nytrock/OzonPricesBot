@@ -13,8 +13,7 @@ class User(Base):
     __tablename__ = 'user'
 
     id: Mapped[pk]
-    tg_id: Mapped[int]
-    is_admin: Mapped[bool]
+    is_admin: Mapped[bool] = mapped_column(default=False)
     have_card: Mapped[bool]
     show_variations: Mapped[bool]
     show_product_image: Mapped[bool]
@@ -27,7 +26,6 @@ class Product(Base):
     __tablename__ = 'product'
 
     id: Mapped[pk]
-    article: Mapped[int]
     name: Mapped[str] = mapped_column(String(200))
     rating: Mapped[float]
 
@@ -49,4 +47,4 @@ class Favorite(Base):
 
     id: Mapped[pk]
     user: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'))
-    product: Mapped[int] = mapped_column(ForeignKey('user.id', ondelete='CASCADE'))
+    product: Mapped[int] = mapped_column(ForeignKey('product.id', ondelete='CASCADE'))

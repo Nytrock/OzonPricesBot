@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 
 from config_data.config import load_config
@@ -9,8 +9,12 @@ engine = create_async_engine(
     echo=db_config.echo,
 )
 
+session_factory = async_sessionmaker(engine)
+
+
 class Base(DeclarativeBase):
     pass
+
 
 async def create_all():
     async with engine.begin() as conn:
