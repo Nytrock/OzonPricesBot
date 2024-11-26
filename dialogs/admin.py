@@ -1,20 +1,39 @@
+from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog
-from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.kbd import Cancel
+from aiogram_dialog.widgets.text import Format, Multi
 
-from handlers.main_menu import to_main_menu
+from handlers.admin import get_admin_statistic, add_new_admin
 from states.states import AdminDialogStates
 from utils.dialog import Translate
 
 statistic = Window(
-    Translate('statistics_users'),
-    Button(Translate('back'), id='statistic_back', on_click=to_main_menu),
-    state=AdminDialogStates.statistic
+    Multi(
+        Translate('statistics_users'),
+        Format('{users_count}'),
+        sep=' '
+    ),
+    Multi(
+        Translate('statistics_products'),
+        Format('{products_count}'),
+        sep=' '
+    ),
+    Multi(
+        Translate('statistics_brands'),
+        Format('{brands_count}'),
+        sep=' '
+    ),
+    Cancel(Translate('back'), id='statistic_back'),
+    state=AdminDialogStates.statistic,
+    getter=get_admin_statistic
 )
 
 
 add_admin = Window(
     Translate('add_admin'),
-    Button(Translate('back'), id='add_admin_back', on_click=to_main_menu),
+    MessageInput(add_new_admin, content_types=[ContentType.TEXT]),
+    Cancel(Translate('cancel'), id='add_admin_back'),
     state=AdminDialogStates.add_admin
 )
 

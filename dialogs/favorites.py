@@ -1,13 +1,12 @@
 from aiogram_dialog import Window, Dialog
-from aiogram_dialog.widgets.kbd import Button, Back
+from aiogram_dialog.widgets.kbd import Button, Back, Cancel
 
-from handlers.main_menu import to_main_menu
 from states.states import FavoritesDialogStates
 from utils.dialog import Translate
 
 favorites_show = Window(
     Translate('favorites_show'),
-    Button(Translate('back'), id='favorites_back', on_click=to_main_menu),
+    Cancel(Translate('back'), id='favorites_back'),
     state=FavoritesDialogStates.favorites_show
 )
 

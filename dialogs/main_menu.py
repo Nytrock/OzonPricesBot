@@ -1,21 +1,16 @@
 from aiogram_dialog import DialogManager, Window, Dialog
 from enums.user_data import UserRole
 
-from handlers.admin import to_stats_admin, to_add_admin
-from handlers.favorites import to_favorites
-from handlers.main_menu import to_about
-from handlers.products import to_product_search
-from handlers.settings import to_settings
-
-from states.states import MainMenuDialogStates
+from states.states import MainMenuDialogStates, ProductsDialogStates, SettingsDialogStates, FavoritesDialogStates, \
+    AdminDialogStates
 from aiogram_dialog.widgets.common import Whenable
-from aiogram_dialog.widgets.kbd import Row, Button, Back
+from aiogram_dialog.widgets.kbd import Row, Button, Back, Start, Next
 from aiogram_dialog.widgets.text import Format, Const, Multi
 
 from utils.dialog import Translate
 
 
-def is_admin(data: dict, widget: Whenable, manager: DialogManager) -> bool:
+def is_admin(data: dict, _0: Whenable, _1: DialogManager) -> bool:
     return data['middleware_data']['user_role'] == UserRole.admin
 
 
@@ -31,37 +26,36 @@ main_menu = Window(
         Translate('main_menu_hello_2'),
         sep=''
     ),
-    Button(Translate('main_menu_products'), id='products', on_click=to_product_search),
+    Start(Translate('main_menu_products'), id='products', state=ProductsDialogStates.product_search),
     Row(
-        Button(
+        Start(
             Translate('main_menu_settings'),
             id='settings',
-            on_click=to_settings
+            state=SettingsDialogStates.all_settings
         ),
-        Button(
+        Start(
             Translate('main_menu_favorites'),
             id='favorites',
-            on_click=to_favorites
+            state=FavoritesDialogStates.favorites_show
         ),
     ),
     Row(
-        Button(
+        Start(
             Translate('main_menu_statistics'),
             id='admin_users',
-            on_click=to_stats_admin,
+            state=AdminDialogStates.statistic,
             when=is_admin
         ),
-        Button(
+        Start(
             Translate('main_menu_add_admin'),
             id='admin_products',
-            on_click=to_add_admin,
+            state=AdminDialogStates.add_admin,
             when=is_admin
         ),
     ),
-    Button(
+    Next(
         Translate('main_menu_about'),
         id='about',
-        on_click=to_about
     ),
     state=MainMenuDialogStates.main_menu,
 )

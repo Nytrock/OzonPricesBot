@@ -1,8 +1,7 @@
 from aiogram_dialog import Window, Dialog
-from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.kbd import Button, Cancel
 from aiogram_dialog.widgets.text import Multi, Format
 
-from handlers.main_menu import to_main_menu
 from states.states import SettingsDialogStates
 from utils.dialog import Translate
 
@@ -12,7 +11,7 @@ all_settings = Window(
         Format('{event.from_user.username}'),
         sep=' '
     ),
-    Button(Translate('back'), id='settings_back', on_click=to_main_menu),
+    Cancel(Translate('back'), id='settings_back'),
     state=SettingsDialogStates.all_settings
 )
 

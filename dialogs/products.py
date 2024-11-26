@@ -1,13 +1,12 @@
 from aiogram_dialog import Window, Dialog
-from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.kbd import Button, Cancel
 
-from handlers.main_menu import to_main_menu
 from states.states import ProductsDialogStates
 from utils.dialog import Translate
 
 product_search = Window(
     Translate('product_search'),
-    Button(Translate('cancel'), id='products_cancel', on_click=to_main_menu),
+    Cancel(Translate('cancel'), id='products_cancel'),
     state=ProductsDialogStates.product_search
 )
 
