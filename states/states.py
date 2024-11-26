@@ -6,3 +6,11 @@ class FSMRegistrationForm(StatesGroup):
     fill_show_variations = State()
     fill_show_product_image = State()
     fill_send_notifications = State()
+
+
+class FSMDialog(StatesGroup):
+    main_menu = State()
+    settings = State()
+    favorites = State()
+    admin_users = State()
+    admin_products = State()

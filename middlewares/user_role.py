@@ -22,4 +22,6 @@ class UserRoleMiddleware(BaseMiddleware):
         else:
             data['user_role'] = UserRole.default
 
+        data['user_is_admin'] = user.is_admin
+
         return await handler(event, data)
