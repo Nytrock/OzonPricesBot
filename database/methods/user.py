@@ -3,13 +3,8 @@ from typing import Any
 from sqlalchemy import insert, select
 
 from enums.user_data import UserShowVariations, UserSendNotifications
-from .database import create_all, session_factory
-from .models import User, Product, Brand
-
-
-async def create_tables() -> None:
-    await create_all()
-
+from ..database import session_factory
+from ..models import User
 
 async def get_user(user_id: int) -> User:
     async with session_factory() as session:
@@ -52,15 +47,29 @@ async def create_admin(user_id: int) -> None:
     await create_user(user_data)
 
 
-async def get_all_products() -> list[Product]:
+async def update_have_card(user_id: int, have_card: bool):
     async with session_factory() as session:
-        query = select(Product)
-        result = await session.execute(query)
-        return result.all()
+        user = await session.get(User, user_id)
+        user.have_card = have_card
+        await session.commit()
 
 
-async def get_all_brands() -> list[Brand]:
+async def update_show_variations(user_id: int, show_variations: int):
     async with session_factory() as session:
-        query = select(Brand)
-        result = await session.execute(query)
-        return result.all()
+        user = await session.get(User, user_id)
+        user.show_variations = show_variations
+        await session.commit()
+
+
+async def update_show_product_image(user_id: int, show_product_image: bool):
+    async with session_factory() as session:
+        user = await session.get(User, user_id)
+        user.show_product_image = show_product_image
+        await session.commit()
+
+
+async def update_send_notifications(user_id: int, send_notifications: int):
+    async with session_factory() as session:
+        user = await session.get(User, user_id)
+        user.send_notifications = send_notifications
+        await session.commit()

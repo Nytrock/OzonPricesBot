@@ -5,12 +5,12 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram_dialog import setup_dialogs
 
 from config_data.config import Config, load_config
-from database.methods import create_tables
+from database.database import create_tables
 from dialogs import main_menu, admin, settings, favorites, products
 from handlers import registration, other_commands
 from lexicon.lexicon import LEXICON
 from middlewares.i18n import TranslatorMiddleware
-from middlewares.user_role import UserRoleMiddleware
+from middlewares.user_data import UserDataMiddleware
 
 
 async def main():
@@ -27,7 +27,7 @@ async def main():
     dp.include_router(registration.router)
     dp.include_router(other_commands.router)
 
-    dp.update.outer_middleware(UserRoleMiddleware())
+    dp.update.outer_middleware(UserDataMiddleware())
     dp.update.middleware(TranslatorMiddleware())
 
     dp.include_router(main_menu.dialog)

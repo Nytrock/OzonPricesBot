@@ -1,17 +1,12 @@
-from aiogram_dialog import DialogManager, Window, Dialog
-from enums.user_data import UserRole
+from aiogram_dialog import Window, Dialog
 
+from enums.user_data import UserRole
 from states.states import MainMenuDialogStates, ProductsDialogStates, SettingsDialogStates, FavoritesDialogStates, \
     AdminDialogStates
-from aiogram_dialog.widgets.common import Whenable
-from aiogram_dialog.widgets.kbd import Row, Button, Back, Start, Next
+from aiogram_dialog.widgets.kbd import Row, Back, Start, Next
 from aiogram_dialog.widgets.text import Format, Const, Multi
 
 from utils.dialog import Translate
-
-
-def is_admin(data: dict, _0: Whenable, _1: DialogManager) -> bool:
-    return data['middleware_data']['user_role'] == UserRole.admin
 
 
 main_menu = Window(
@@ -44,13 +39,13 @@ main_menu = Window(
             Translate('main_menu_statistics'),
             id='admin_users',
             state=AdminDialogStates.statistic,
-            when=is_admin
+            when=lambda data, _0, _1: data['middleware_data']['user_role'] == UserRole.admin
         ),
         Start(
             Translate('main_menu_add_admin'),
             id='admin_products',
             state=AdminDialogStates.add_admin,
-            when=is_admin
+            when=lambda data, _0, _1: data['middleware_data']['user_role'] == UserRole.admin
         ),
     ),
     Next(
@@ -63,7 +58,10 @@ main_menu = Window(
 
 about = Window(
     Translate('about'),
-    Back(Translate('back')),
+    Back(
+        Translate('back'),
+        id='about_back'
+    ),
     state=MainMenuDialogStates.about
 )
 
