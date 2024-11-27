@@ -1,4 +1,7 @@
 import json
+import re
+import textwrap
+from lib2to3.fixes.fix_input import context
 from pprint import pprint
 
 from bs4 import BeautifulSoup
@@ -8,7 +11,7 @@ from curl_cffi import requests
 from utils.url_parser import get_product_id_from_inner_url
 
 PRODUCT_URL = 'https://www.ozon.ru/product'
-SEARCH_URL = 'https://www.ozon.ru/search/?text='
+SEARCH_URL = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?Flayout_container=categorySearchMegapagination&layout_page_index={page_index}&page={page_index}&text={text}'
 SEARCH_RESULTS_COUNT = 8
 
 PRICE_SYMBOLS = [' ', '₽']
@@ -30,8 +33,7 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
     result = {'regular_price': -1, 'card_price': -1}
     price_div = product_soup.find(attrs={'data-widget' : 'webPrice'})
     if price_div is None:
-        result['is_not_exists'] = True
-        return result
+        return {}
 
     out_of_stock_div = product_soup.find(attrs={'data-widget' : 'webOutOfStock'})
     if out_of_stock_div is not None:
@@ -53,15 +55,13 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
 
     return result
 
-def get_product_info_by_id(product_id: int) -> dict[str, Any]:
-    result = {}
+async def get_product_info_by_id(product_id: int) -> dict[str, Any]:
+    result = {'id': product_id}
     product_soup = get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
     result |= get_product_prices_from_soup(product_soup)
 
-    if result.get('is_not_exists'):
-        result = {'regular_price': -1, 'card_price': -1, 'title': '', 'brand': '',
-                  'rating': 0, 'rating_count': 0, 'image': '', 'description': '', 'variations': []}
-        return result
+    if result.get('regular_price') is None:
+        return {}
 
     info_div = product_soup.find('script', attrs={'type': 'application/ld+json'})
     product_info = json.loads(info_div.text)
@@ -70,37 +70,45 @@ def get_product_info_by_id(product_id: int) -> dict[str, Any]:
         result['rating'] = 0
         result['rating_count'] = 0
     else:
-        result['rating'] = product_info['aggregateRating']['ratingValue']
-        result['rating_count'] = product_info['aggregateRating']['reviewCount']
+        result['rating'] = float(product_info['aggregateRating']['ratingValue'])
+        result['rating_count'] = int(product_info['aggregateRating']['reviewCount'])
 
-    result['brand'] = product_info['brand']
     result['title'] = product_info['name']
     result['image'] = product_info['image']
-    result['description'] = product_info['description']
+    result['description'] = textwrap.shorten(product_info['description'], width=200, placeholder='...')
 
-    variants_div = product_soup.find(id='state-webAspects-3529295-default-1')
+    seller_div = product_soup.find(id=lambda value: value and value.startswith('state-webStickyProducts-'))
+    result['seller'] = json.loads(seller_div['data-state'])['seller']['name']
+
+    variants_div = product_soup.find(id=lambda value: value and value.startswith('state-webAspects-'))
     if variants_div is None:
-        result['variants'] = []
+        result['variations'] = set()
         return result
 
-    result['variants'] = set()
+    result['variations'] = set()
     variants_data = json.loads(variants_div['data-state'])
     for aspect in variants_data['aspects']:
         for variant in aspect['variants']:
             variation_id = get_product_id_from_inner_url(variant['link'])
             if variation_id != product_id:
-                result['variants'].add(variation_id)
-    result['variants'] = list(result['variants'])
+                result['variations'].add(variation_id)
+    result['variations'] = list(result['variations'])
 
     return result
 
-def get_products_by_search(text: str) -> list[int]:
-    search_soup = get_page_soup(f'{SEARCH_URL}{text}')
-    products_div = search_soup.find(attrs={'data-widget': 'searchResultsV2'})
+async def get_products_by_search(text: str, page_index=1) -> list[int]:
+    url = SEARCH_URL.format(text=text, page_index=page_index)
+    session = requests.Session()
+    response = session.get(url)
+    data = json.loads(response.text)['widgetStates']
+
+    for key in data.keys():
+        if key.startswith('searchResultsV2') and data[key] != '{}':
+            data = json.loads(data[key])
+            break
 
     result = []
-    for i in range(SEARCH_RESULTS_COUNT):
-        product = products_div.find(attrs={'data-index': str(i)})
-        product_link = product.a['href']
-        result.append(get_product_id_from_inner_url(product_link))
+    for item in data['items']:
+        item_id = item['multiButton']['ozonButton']['addToCartButtonWithQuantity']['action']['id']
+        result.append(int(item_id))
     return result

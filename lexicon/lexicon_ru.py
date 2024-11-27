@@ -52,6 +52,7 @@ LEXICON_RU: dict[str, str] = {
     'UserSendNotifications.yes': 'Присылать',
     'UserSendNotifications.no': 'Не присылать',
     'UserSendNotifications.only_lowering': 'Присылать только при понижении цены',
+    'product_search_id_error': 'Товара с таким артикулом не существует',
     'cancel': 'Отмена',
     'back': 'Назад',
     'yes': 'Да',

@@ -32,7 +32,7 @@ class Product(Base):
     title: Mapped[str] = mapped_column(String(200))
     rating: Mapped[float]
     rating_count: Mapped[int]
-    brand: Mapped[int] = mapped_column(ForeignKey('brand.id', ondelete='CASCADE'))
+    seller: Mapped[int] = mapped_column(ForeignKey('seller.id', ondelete='CASCADE'))
     description: Mapped[str]
     image: Mapped[str]
     product_group: Mapped[int] = mapped_column(ForeignKey('product_group.id', ondelete='CASCADE'))
@@ -66,8 +66,8 @@ class ProductGroup(Base):
 
     id: Mapped[pk]
 
-class Brand(Base):
-    __tablename__ = 'brand'
+class Seller(Base):
+    __tablename__ = 'seller'
 
     id: Mapped[pk]
     name: Mapped[str]
