@@ -8,9 +8,8 @@ class UserRole(enum.Enum):
 
 
 class UserShowVariations(enum.Enum):
-    yes = 0
-    no = 1
-    only_cheaper = 2
+    all = 0
+    only_cheaper = 1
 
 
 class UserSendNotifications(enum.Enum):

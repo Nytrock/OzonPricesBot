@@ -9,11 +9,7 @@ from states.states import SettingsDialogStates
 from utils.dialog import Translate, create_enum_select
 
 all_settings = Window(
-    Multi(
-        Translate('settings_all'),
-        Format('{event.from_user.username}'),
-        sep=' '
-    ),
+    Translate('settings_all'),
     SwitchTo(
         Translate('settings_show_image'),
         id='show_image_change',

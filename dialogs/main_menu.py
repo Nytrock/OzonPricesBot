@@ -10,18 +10,13 @@ from utils.dialog import Translate
 
 
 main_menu = Window(
-    Multi(
-        Translate('main_menu_hello'),
-        Format('{event.from_user.username}'),
-        Const('!'),
-        sep=''
-    ),
+    Translate('main_menu_hello'),
     Multi(
         Const('\n'),
         Translate('main_menu_hello_2'),
         sep=''
     ),
-    Start(Translate('main_menu_products'), id='products', state=ProductsDialogStates.product_search),
+    Start(Translate('main_menu_products'), id='products', state=ProductsDialogStates.product_get_id),
     Row(
         Start(
             Translate('main_menu_settings'),

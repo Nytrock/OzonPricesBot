@@ -7,7 +7,9 @@ from pprint import pprint
 from bs4 import BeautifulSoup
 from typing import Any
 from curl_cffi import requests
+from sqlalchemy import result_tuple
 
+from utils.dialog import Translate
 from utils.url_parser import get_product_id_from_inner_url
 
 PRODUCT_URL = 'https://www.ozon.ru/product'
@@ -55,7 +57,7 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
 
     return result
 
-async def get_product_info_by_id(product_id: int) -> dict[str, Any]:
+async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
     result = {'id': product_id}
     product_soup = get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
     result |= get_product_prices_from_soup(product_soup)
@@ -102,12 +104,17 @@ async def get_products_by_search(text: str, page_index=1) -> list[int]:
     response = session.get(url)
     data = json.loads(response.text)['widgetStates']
 
+    is_data_find = False
     for key in data.keys():
         if key.startswith('searchResultsV2') and data[key] != '{}':
             data = json.loads(data[key])
+            is_data_find = True
             break
 
     result = []
+    if not is_data_find:
+        return result
+
     for item in data['items']:
         item_id = item['multiButton']['ozonButton']['addToCartButtonWithQuantity']['action']['id']
         result.append(int(item_id))

@@ -2,28 +2,15 @@ from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Cancel
-from aiogram_dialog.widgets.text import Format, Multi
 
 from handlers.admin import get_admin_statistic, add_new_admin
 from states.states import AdminDialogStates
 from utils.dialog import Translate
 
 statistic = Window(
-    Multi(
-        Translate('statistics_users'),
-        Format('{users_count}'),
-        sep=' '
-    ),
-    Multi(
-        Translate('statistics_products'),
-        Format('{products_count}'),
-        sep=' '
-    ),
-    Multi(
-        Translate('statistics_brands'),
-        Format('{brands_count}'),
-        sep=' '
-    ),
+    Translate('statistics_users'),
+    Translate('statistics_products'),
+    Translate('statistics_brands'),
     Cancel(Translate('back'), id='statistic_back'),
     state=AdminDialogStates.statistic,
     getter=get_admin_statistic

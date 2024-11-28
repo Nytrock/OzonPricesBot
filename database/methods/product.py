@@ -1,10 +1,11 @@
+from typing import Any
+
 from sqlalchemy import select, insert
-from sqlalchemy.dialects.postgresql import Any
 from sqlalchemy.exc import NoResultFound
 
-from exernal_services.ozon_scrapper import get_product_info_by_id
+from exernal_services.ozon_scrapper import get_product_data_from_ozon
 from ..database import session_factory
-from ..models import Product, Seller, ProductGroup
+from ..models import Product, Seller, ProductGroup, Price
 
 
 async def get_all_products() -> list[Product]:
@@ -14,7 +15,7 @@ async def get_all_products() -> list[Product]:
         return result.all()
 
 
-async def get_all_brands() -> list[Seller]:
+async def get_all_sellers() -> list[Seller]:
     async with session_factory() as session:
         query = select(Seller)
         result = await session.execute(query)
@@ -23,75 +24,110 @@ async def get_all_brands() -> list[Seller]:
 
 async def get_product_info(product_id: int) -> dict[str, Any]:
     async with session_factory() as session:
-        query = select(Product).filter(Product.id == product_id).join(Seller, Seller.id == Product.seller)
-        result = await session.execute(query)
+        product = await session.get(Product, product_id)
+        if product is not None:
+            return await get_data_from_product(product)
 
-        try:
-            product = result.scalar_one()
-            product_data = {
-                'id': product.id,
-                'title': product.title,
-                'rating': product.rating,
-                'rating_count': product.rating_count,
-                'description': product.description,
-                'image': product.image,
-            }
-
-            seller = await session.get(Seller, product.seller)
-            product_data['seller'] = seller.name
+        product_data = await get_product_data_from_ozon(product_id)
+        if product_data == {}:
+            return {}
+        else:
+            await create_product(product_data)
             return product_data
-        except NoResultFound:
-            product_data = await get_product_info_by_id(product_id)
-            if product_data == {}:
-                return {}
-            else:
-                await create_product(product_data.copy())
-                for key in ['variations', 'card_price', 'regular_price']:
-                    product_data.pop(key)
-                return product_data
+
+
+async def get_data_from_product(product: Product) -> dict[str, Any]:
+    product_data = {
+        'id': product.id,
+        'title': product.title,
+        'rating': product.rating,
+        'rating_count': product.rating_count,
+        'description': product.description,
+        'image': product.image,
+        'seller': product.seller.name,
+        'variations': [],
+    }
+
+    async with session_factory() as session:
+        query = select(Price).filter(Price.product == product.id).order_by(Price.date.desc()).limit(1)
+        price_obj = await session.execute(query)
+        price = price_obj.scalar_one()
+        product_data['card_price'] = price.card_price
+        product_data['regular_price'] = price.regular_price
+
+        query = select(Product).filter(Product.product_group == product.product_group, Product.id != product.id)
+        variations_obj = await session.execute(query)
+        variations = variations_obj.scalars()
+
+        for variation in variations:
+            query = select(Price).filter(Price.product == variation.id).order_by(Price.date.desc()).limit(1)
+            variation_price = (await session.execute(query)).scalar_one()
+            data = {
+                'id': variation.id,
+                'title': variation.title,
+                'rating': variation.rating,
+                'regular_price': variation_price.regular_price,
+                'card_price': variation_price.card_price
+            }
+            product_data['variations'].append(data)
+
+    return product_data
 
 
 async def create_product(product_data: dict[str, Any]) -> None:
     async with session_factory() as session:
-        product_data.pop('card_price')
-        product_data.pop('regular_price')
-
         variations = list(product_data.pop('variations'))
-        seller_name = product_data.pop('seller')
+        product_data_to_create = product_data.copy()
+        for key in ['card_price', 'regular_price']:
+            product_data_to_create.pop(key)
 
+        seller_name = product_data_to_create.pop('seller')
         query = select(Seller).filter(Seller.name == seller_name)
         seller_data = await session.execute(query)
 
         try:
             seller = seller_data.scalar_one()
         except NoResultFound:
-            await create_brand(seller_name)
+            await create_seller(seller_name)
             seller_data = await session.execute(query)
             seller = seller_data.scalar_one()
-        product_data['seller'] = seller.id
+        product_data_to_create['seller_id'] = seller.id
+
+        await create_product_price(product_data)
 
         query = select(ProductGroup).order_by(ProductGroup.id.desc()).limit(1)
         group_id = len((await session.execute(query)).all()) + 1
         await create_product_group(group_id)
-        product_data['product_group'] = group_id
+        product_data_to_create['product_group'] = group_id
 
-        values = [product_data]
+        values = [product_data_to_create]
+        product_data['variations'] = []
         for variation in variations:
-            variation_data = await get_product_info_by_id(variation)
-            for key in ['variations', 'seller', 'card_price', 'regular_price']:
+            variation_data = await get_product_data_from_ozon(variation)
+            await create_product_price(variation_data)
+
+            for key in ['variations', 'seller']:
                 variation_data.pop(key)
-            variation_data['seller'] = seller.id
+            variation_data['seller_id'] = seller.id
             variation_data['product_group'] = group_id
+
             values.append(variation_data)
+            product_data['variations'].append({
+                'id': variation_data['id'],
+                'title': variation_data['title'],
+                'rating': variation_data['rating'],
+                'regular_price': variation_data.pop('regular_price'),
+                'card_price': variation_data.pop('card_price')
+            })
 
         query = insert(Product).values(values)
         await session.execute(query)
         await session.commit()
 
 
-async def create_brand(brand_name: str) -> None:
+async def create_seller(seller_name: str) -> None:
     async with session_factory() as session:
-        query = insert(Seller).values(name=brand_name)
+        query = insert(Seller).values(name=seller_name)
         await session.execute(query)
         await session.commit()
 
@@ -101,3 +137,15 @@ async def create_product_group(group_id: int) -> None:
         query = insert(ProductGroup).values(id=group_id)
         await session.execute(query)
         await session.commit()
+
+
+async def create_product_price(product_data: dict[str, Any]) -> None:
+    async with session_factory() as session:
+        query = insert(Price).values(
+            product=product_data['id'],
+            card_price=product_data['card_price'],
+            regular_price=product_data['regular_price']
+        )
+        await session.execute(query)
+        await session.commit()
+

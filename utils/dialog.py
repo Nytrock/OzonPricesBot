@@ -3,15 +3,23 @@ from pathlib import Path
 from typing import Callable, Union
 
 from aiogram.enums import ContentType
+from aiogram.types import CallbackQuery
+from aiogram_dialog import DialogProtocol, DialogManager, SubManager
 from aiogram_dialog.widgets.common import WhenCondition
-from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.kbd import Button, ListGroup
 from aiogram_dialog.widgets.media import StaticMedia
 from aiogram_dialog.widgets.text import Format, Multi, Const, Text
+from aiogram_dialog.widgets.text.format import _FormatDataStub
 
 
 class Translate(Format):
     def __init__(self, text: str, when: WhenCondition = None):
         super().__init__(when=when, text='{middleware_data[i18n][' + text + ']}')
+
+    async def _render_text(self, data: dict, manager: DialogManager) -> str:
+        if manager.is_preview():
+            return self.text.format_map(_FormatDataStub(data=data)).format_map(_FormatDataStub(data=data))
+        return self.text.format_map(data).format_map(data)
 
 
 class DataStaticMedia(StaticMedia):
@@ -45,3 +53,27 @@ def create_enum_select(enum_type: EnumType, middleware_param: str, on_click: Cal
             ),
         ])
     return result
+
+
+class CustomListGroup(ListGroup):
+    async def _process_item_callback(
+            self,
+            callback: CallbackQuery,
+            data: str,
+            dialog: DialogProtocol,
+            manager: DialogManager,
+    ) -> bool:
+        item_id, callback_data = data.split(':', maxsplit=1)
+        callback = callback.model_copy(update={
+            'data': callback_data,
+            'item_id': item_id
+        })
+        sub_manager = SubManager(
+            widget=self,
+            manager=manager,
+            widget_id=self.widget_id,
+            item_id=item_id,
+        )
+        for b in self.buttons:
+            if await b.process_callback(callback, dialog, sub_manager):
+                return True

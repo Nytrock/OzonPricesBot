@@ -32,7 +32,7 @@ class Product(Base):
     title: Mapped[str] = mapped_column(String(200))
     rating: Mapped[float]
     rating_count: Mapped[int]
-    seller: Mapped[int] = mapped_column(ForeignKey('seller.id', ondelete='CASCADE'))
+    seller_id: Mapped[int] = mapped_column(ForeignKey('seller.id', ondelete='CASCADE'))
     description: Mapped[str]
     image: Mapped[str]
     product_group: Mapped[int] = mapped_column(ForeignKey('product_group.id', ondelete='CASCADE'))
@@ -42,6 +42,8 @@ class Product(Base):
         back_populates='favorite_products'
     )
 
+    seller: Mapped['Seller'] = relationship(lazy='joined')
+
 
 class Price(Base):
     __tablename__ = 'price'
@@ -50,8 +52,7 @@ class Price(Base):
     product: Mapped[int] = mapped_column(ForeignKey('product.id', ondelete='CASCADE'))
     date: Mapped[datetime.date] = mapped_column(default=datetime.date.today())
     card_price: Mapped[int]
-    no_card_price: Mapped[int]
-
+    regular_price: Mapped[int]
 
 class Favorite(Base):
     __tablename__ = 'favorite'

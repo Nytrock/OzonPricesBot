@@ -32,6 +32,6 @@ class FavoritesDialogStates(StatesGroup):
 
 
 class ProductsDialogStates(StatesGroup):
+    product_get_id = State()
     product_search = State()
-    product_search_list = State()
     product_detail = State()

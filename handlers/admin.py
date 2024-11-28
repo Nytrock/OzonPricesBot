@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.input import MessageInput
 from pyrogram.errors import UsernameInvalid
 
 from config_data.config import load_config
-from database.methods import get_all_users, get_all_products, get_all_brands, make_user_admin
+from database.methods import get_all_users, get_all_products, get_all_sellers, make_user_admin
 
 
 async def get_admin_statistic(**kwargs) -> dict[str, Any]:
@@ -15,7 +15,7 @@ async def get_admin_statistic(**kwargs) -> dict[str, Any]:
 
     data['users_count'] = len(await get_all_users())
     data['products_count'] = len(await get_all_products())
-    data['brands_count'] = len(await get_all_brands())
+    data['sellers_count'] = len(await get_all_sellers())
 
     return data
 

@@ -50,7 +50,7 @@ async def registration_card_success(message: Message, i18n: dict[str, str], stat
 
     await message.answer(
         text=i18n.get('registration_variation'),
-        reply_markup=create_reply_kb(i18n, 2, 'yes', 'no', 'registration_variation_only_cheap')
+        reply_markup=create_reply_kb(i18n, 2, 'registration_variation_all', 'registration_variation_only_cheap')
     )
     await state.set_state(RegistrationStates.fill_show_variations)
 
@@ -64,7 +64,7 @@ async def registration_card_error(message: Message, i18n: dict[str, str]):
 
 
 @router.message(StateFilter(RegistrationStates.fill_show_variations),
-                RegistrationFilter(possible_replies=['yes', 'no', 'registration_variation_only_cheap']))
+                RegistrationFilter(possible_replies=['registration_variation_all', 'registration_variation_only_cheap']))
 async def registration_variations_success(message: Message, i18n: dict[str, str], state: FSMContext):
     await state.update_data(show_variations=message_to_variations_enum(message, i18n))
 
@@ -79,7 +79,7 @@ async def registration_variations_success(message: Message, i18n: dict[str, str]
 async def registration_variations_error(message: Message, i18n: dict[str, str]):
     await message.answer(
         text=i18n.get('registration_variation_error'),
-        reply_markup=create_reply_kb(i18n, 2, 'yes', 'no', 'registration_variation_only_cheap')
+        reply_markup=create_reply_kb(i18n, 2, 'registration_variation_all', 'registration_variation_only_cheap')
     )
 
 
