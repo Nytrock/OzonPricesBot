@@ -11,12 +11,11 @@ from database.methods import get_all_users, get_all_products, get_all_sellers, m
 
 
 async def get_admin_statistic(**kwargs) -> dict[str, Any]:
-    data = {}
-
-    data['users_count'] = len(await get_all_users())
-    data['products_count'] = len(await get_all_products())
-    data['sellers_count'] = len(await get_all_sellers())
-
+    data = {
+        'users_count': len(await get_all_users()),
+        'products_count': len(await get_all_products()),
+        'sellers_count': len(await get_all_sellers())
+    }
     return data
 
 

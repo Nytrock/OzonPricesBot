@@ -54,6 +54,7 @@ class Price(Base):
     card_price: Mapped[int]
     regular_price: Mapped[int]
 
+
 class Favorite(Base):
     __tablename__ = 'favorite'
 

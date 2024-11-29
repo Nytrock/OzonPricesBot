@@ -57,6 +57,7 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
 
     return result
 
+
 async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
     result = {'id': product_id}
     product_soup = get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')

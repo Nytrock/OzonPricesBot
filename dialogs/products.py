@@ -2,10 +2,10 @@ from aiogram import F
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Back, SwitchTo
+from aiogram_dialog.widgets.kbd import Cancel, Group, Button
 from aiogram_dialog.widgets.text import Format, Multi, Const, Jinja
 
-from handlers.products import search_product, change_variations_mode, change_product
+from handlers.products import search_product, change_variations_mode, change_product, change_product_favorite
 from states.states import ProductsDialogStates
 from utils.dialog import Translate, DataStaticMedia, CustomListGroup
 
@@ -29,7 +29,9 @@ product_detail = Window(
         type=ContentType.PHOTO,
         when=lambda data, _0, _1: data['middleware_data']['user_show_image']
     ),
-    Jinja('<b><a href="https://www.ozon.ru/product/{{ dialog_data.product.id }}">{{ dialog_data.product.title }}</a></b>'),
+    Jinja(
+        '<b><a href="https://www.ozon.ru/product/{{ dialog_data.product.id }}">{{ dialog_data.product.title }}</a></b>'
+    ),
     Const(' '),
     Translate(
         'product_price_have_card',
@@ -49,9 +51,17 @@ product_detail = Window(
         ),
         Button(
             Translate('product_to_favorites'),
-            id='product_to_favorites'
+            on_click=change_product_favorite,
+            id='product_to_favorites',
+            when=lambda data, _0, _1: not data['dialog_data']['into_favorites']
         ),
-        Back(
+        Button(
+            Translate('product_from_favorites'),
+            on_click=change_product_favorite,
+            id='product_from_favorites',
+            when=lambda data, _0, _1: data['dialog_data']['into_favorites']
+        ),
+        Cancel(
             Translate('close'),
             id='products_detail_cancel'
         ),
@@ -64,11 +74,11 @@ product_detail = Window(
                 Multi(
                     Translate(
                         'product_variant_have_card',
-                        when=lambda data, _0, _1: data['data']['middleware_data']['user_have_card']
+                        when=lambda data, _0, _1: data['middleware_data']['user_have_card']
                     ),
                     Format(
                         'product_variant_no_card',
-                        when=lambda data, _0, _1: not data['data']['middleware_data']['user_have_card']
+                        when=lambda data, _0, _1: not data['middleware_data']['user_have_card']
                     ),
                 ),
                 on_click=change_product,
@@ -83,7 +93,20 @@ product_detail = Window(
             on_click=change_variations_mode,
             id='product_show_variations'
         ),
-        when=F['dialog_data']['variations_mode']
+        when=lambda data, _0, _1: data['dialog_data']['variations_mode'] and data['dialog_data']['have_variations']
+    ),
+    Group(
+        Button(
+            Translate('product_no_variations'),
+            on_click=change_variations_mode,
+            id='product_no_variations'
+        ),
+        Button(
+            Translate('back'),
+            on_click=change_variations_mode,
+            id='product_show_variations'
+        ),
+        when=lambda data, _0, _1: data['dialog_data']['variations_mode'] and not data['dialog_data']['have_variations']
     ),
     parse_mode='HTML',
     state=ProductsDialogStates.product_detail

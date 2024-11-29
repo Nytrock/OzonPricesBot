@@ -1,11 +1,11 @@
 from typing import Any
 
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, delete
 from sqlalchemy.exc import NoResultFound
 
 from exernal_services.ozon_scrapper import get_product_data_from_ozon
 from ..database import session_factory
-from ..models import Product, Seller, ProductGroup, Price
+from ..models import Product, Seller, ProductGroup, Price, Favorite
 
 
 async def get_all_products() -> list[Product]:
@@ -149,3 +149,28 @@ async def create_product_price(product_data: dict[str, Any]) -> None:
         await session.execute(query)
         await session.commit()
 
+
+async def change_favorite(user_id: int, product_id: int) -> bool:
+    async with session_factory() as session:
+        favorite_exists = await is_favorite_exists(user_id, product_id)
+
+        if favorite_exists:
+            query = delete(Favorite).where(Favorite.user == user_id, Favorite.product == product_id)
+        else:
+            query = insert(Favorite).values(user=user_id, product=product_id)
+        await session.execute(query)
+        await session.commit()
+
+        return not favorite_exists
+
+
+async def is_favorite_exists(user_id: int, product_id: int):
+    async with session_factory() as session:
+        query = select(Favorite).filter(Favorite.user == user_id, Favorite.product == product_id)
+        favorite_data = await session.execute(query)
+
+        try:
+            favorite_data.scalar_one()
+            return True
+        except NoResultFound:
+            return False
