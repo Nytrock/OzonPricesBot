@@ -37,7 +37,8 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
     if out_of_stock_div is not None:
         return result
 
-    for text in price_div.get_text().split(' '):
+    prices = price_div.get_text()
+    for text in prices.split(' '):
         if text == '':
             continue
 
@@ -47,6 +48,8 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
         if text.isdigit():
             if result['card_price'] == -1:
                 result['card_price'] = int(text)
+                if 'c Ozon Картой' not in prices:
+                    result['regular_price'] = int(text)
             elif result['regular_price'] == -1:
                 result['regular_price'] = int(text)
                 break

@@ -2,11 +2,11 @@ from aiogram import F
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Row, SwitchTo
+from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Row, SwitchTo, Back
 from aiogram_dialog.widgets.text import Format, Multi, Const, Jinja
 
 from handlers.products import search_product, change_variations_mode, change_product, change_product_favorite, \
-    previous_search_page, next_search_page
+    previous_search_page, next_search_page, product_detail_start, previous_variations, next_variations
 from states.states import ProductsDialogStates
 from utils.dialog import Translate, DataStaticMedia, CustomListGroup
 
@@ -105,7 +105,13 @@ product_detail = Window(
         ),
         Cancel(
             Translate('close'),
-            id='products_detail_cancel'
+            id='products_detail_cancel',
+            when=lambda data, _0, _1: not data['dialog_data'].get('have_search_result')
+        ),
+        Back(
+            Translate('close'),
+            id='products_detail_back',
+            when=lambda data, _0, _1: data['dialog_data'].get('have_search_result')
         ),
         width=2,
         when=lambda data, _0, _1: not data['dialog_data']['variations_mode']
@@ -128,7 +134,25 @@ product_detail = Window(
             ),
             id='variations_list',
             item_id_getter=lambda item: item['id'],
-            items=F['dialog_data']['product']['variations'],
+            items='variations_limit',
+        ),
+        Row(
+            Button(
+                Const('<'),
+                id='variations_back',
+                when=lambda data, _0, _1: data['dialog_data']['page_num'] > 1,
+                on_click=previous_variations
+            ),
+            Button(
+                Format('{dialog_data[page_num]}/{dialog_data[variation_pages]}'),
+                id='variations_page',
+            ),
+            Button(
+                Const('>'),
+                id='variations_next',
+                when=lambda data, _0, _1: data['dialog_data']['page_num'] < data['dialog_data']['variation_pages'],
+                on_click=next_variations
+            )
         ),
         Button(
             Translate('product_hide_variations'),
@@ -150,12 +174,13 @@ product_detail = Window(
         when=lambda data, _0, _1: data['dialog_data']['variations_mode'] and not data['dialog_data']['have_variations']
     ),
     parse_mode='HTML',
-    state=ProductsDialogStates.product_detail
+    state=ProductsDialogStates.product_detail,
+    getter=product_detail_start
 )
 
 
 dialog = Dialog(
     product_search,
     product_search_list,
-    product_detail
+    product_detail,
 )

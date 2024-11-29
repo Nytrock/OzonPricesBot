@@ -65,6 +65,8 @@ LEXICON_RU: dict[str, str] = {
     'product_hide_variations': '↪️ Скрыть варианты',
     'product_to_favorites': '⭐ В избранное',
     'product_from_favorites': '⭐ Удалить из избранного',
+    'favorites_edit_button': '✏️ Редактировать',
+    'favorites_empty': 'У вас нет товаров в избранном',
     'cancel': '❌ Отмена',
     'close': '❌ Закрыть',
     'back': '⬅️ Назад',

@@ -16,7 +16,11 @@ main_menu = Window(
         Translate('main_menu_hello_2'),
         sep=''
     ),
-    Start(Translate('main_menu_products'), id='products', state=ProductsDialogStates.product_get_id),
+    Start(
+        Translate('main_menu_products'),
+        id='products',
+        state=ProductsDialogStates.product_get_id
+    ),
     Row(
         Start(
             Translate('main_menu_settings'),
