@@ -53,6 +53,7 @@ LEXICON_RU: dict[str, str] = {
     'UserSendNotifications.no': 'Не присылать',
     'UserSendNotifications.only_lowering': 'Присылать только при понижении цены',
     'product_search': 'По запросу "{dialog_data[search_query]}" были найдены следующие результаты',
+    'product_search_error': 'По запросу "{dialog_data[search_query]}" не было найдено никаких результатов',
     'product_id_error': 'Товара с таким артикулом не существует',
     'product_price_have_card': 'Цена на данный момент: {dialog_data[product][card_price]} руб.',
     'product_price_no_card': 'Цена на данный момент: {dialog_data[product][regular_price]} руб.',

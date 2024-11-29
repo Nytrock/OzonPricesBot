@@ -1,19 +1,15 @@
+import html
 import json
-import re
 import textwrap
-from lib2to3.fixes.fix_input import context
-from pprint import pprint
 
 from bs4 import BeautifulSoup
 from typing import Any
 from curl_cffi import requests
-from sqlalchemy import result_tuple
-
-from utils.dialog import Translate
 from utils.url_parser import get_product_id_from_inner_url
 
 PRODUCT_URL = 'https://www.ozon.ru/product'
-SEARCH_URL = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?Flayout_container=categorySearchMegapagination&layout_page_index={page_index}&page={page_index}&text={text}'
+SEARCH_URL = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?page={page_index}&text={text}'
+SEARCH_URL_SPARE = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?page_index={page_index}&text={text}'
 SEARCH_RESULTS_COUNT = 8
 
 PRICE_SYMBOLS = [' ', '₽']
@@ -49,10 +45,10 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
             text = text.replace(symbol, '')
 
         if text.isdigit():
-            if result['regular_price'] == -1:
-                result['regular_price'] = int(text)
-            elif result['card_price'] == -1:
+            if result['card_price'] == -1:
                 result['card_price'] = int(text)
+            elif result['regular_price'] == -1:
+                result['regular_price'] = int(text)
                 break
 
     return result
@@ -76,7 +72,7 @@ async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
         result['rating'] = float(product_info['aggregateRating']['ratingValue'])
         result['rating_count'] = int(product_info['aggregateRating']['reviewCount'])
 
-    result['title'] = product_info['name']
+    result['title'] = html.unescape(product_info['name'])
     result['image'] = product_info['image']
     result['description'] = textwrap.shorten(product_info['description'], width=200, placeholder='...')
 
@@ -99,24 +95,39 @@ async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
 
     return result
 
-async def get_products_by_search(text: str, page_index=1) -> list[int]:
+async def get_products_by_search(text: str, page_index=1) -> list[dict[str, Any]]:
     url = SEARCH_URL.format(text=text, page_index=page_index)
+    data = await get_search_data(url)
+    if not data:
+        url = SEARCH_URL_SPARE.format(text=text, page_index=page_index)
+        data = await get_search_data(url)
+
+    result = []
+    if not data:
+        return result
+
+    for item in data['items']:
+        item_data = {
+            'id': get_product_id_from_inner_url(item['action']['link'])
+        }
+
+        for state in item['mainState']:
+            if state['atom'].get('textAtom'):
+                if state['atom']['textAtom']['textStyle'] == 'tsBodyL':
+                    item_data['title'] = state['atom']['textAtom']['text']
+                    break
+        item_data['title'] = html.unescape(item_data['title'])
+        result.append(item_data)
+    return result
+
+
+async def get_search_data(url: str) -> dict[str, Any]:
     session = requests.Session()
     response = session.get(url)
     data = json.loads(response.text)['widgetStates']
 
-    is_data_find = False
+    result = {}
     for key in data.keys():
         if key.startswith('searchResultsV2') and data[key] != '{}':
-            data = json.loads(data[key])
-            is_data_find = True
-            break
-
-    result = []
-    if not is_data_find:
-        return result
-
-    for item in data['items']:
-        item_id = item['multiButton']['ozonButton']['addToCartButtonWithQuantity']['action']['id']
-        result.append(int(item_id))
+            result = json.loads(data[key])
     return result

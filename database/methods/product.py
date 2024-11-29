@@ -1,11 +1,12 @@
 from typing import Any
 
-from sqlalchemy import select, insert, delete
+from sqlalchemy import select, insert
 from sqlalchemy.exc import NoResultFound
 
 from exernal_services.ozon_scrapper import get_product_data_from_ozon
+from .price import create_product_price
 from ..database import session_factory
-from ..models import Product, Seller, ProductGroup, Price, Favorite
+from ..models import Product, Seller, ProductGroup, Price
 
 
 async def get_all_products() -> list[Product]:
@@ -95,10 +96,8 @@ async def create_product(product_data: dict[str, Any]) -> None:
 
         await create_product_price(product_data)
 
-        query = select(ProductGroup).order_by(ProductGroup.id.desc()).limit(1)
-        group_id = len((await session.execute(query)).all()) + 1
-        await create_product_group(group_id)
-        product_data_to_create['product_group'] = group_id
+        await create_product_group(product_data['id'])
+        product_data_to_create['product_group'] = product_data['id']
 
         values = [product_data_to_create]
         product_data['variations'] = []
@@ -109,7 +108,7 @@ async def create_product(product_data: dict[str, Any]) -> None:
             for key in ['variations', 'seller']:
                 variation_data.pop(key)
             variation_data['seller_id'] = seller.id
-            variation_data['product_group'] = group_id
+            variation_data['product_group'] = product_data['id']
 
             values.append(variation_data)
             product_data['variations'].append({
@@ -137,40 +136,3 @@ async def create_product_group(group_id: int) -> None:
         query = insert(ProductGroup).values(id=group_id)
         await session.execute(query)
         await session.commit()
-
-
-async def create_product_price(product_data: dict[str, Any]) -> None:
-    async with session_factory() as session:
-        query = insert(Price).values(
-            product=product_data['id'],
-            card_price=product_data['card_price'],
-            regular_price=product_data['regular_price']
-        )
-        await session.execute(query)
-        await session.commit()
-
-
-async def change_favorite(user_id: int, product_id: int) -> bool:
-    async with session_factory() as session:
-        favorite_exists = await is_favorite_exists(user_id, product_id)
-
-        if favorite_exists:
-            query = delete(Favorite).where(Favorite.user == user_id, Favorite.product == product_id)
-        else:
-            query = insert(Favorite).values(user=user_id, product=product_id)
-        await session.execute(query)
-        await session.commit()
-
-        return not favorite_exists
-
-
-async def is_favorite_exists(user_id: int, product_id: int):
-    async with session_factory() as session:
-        query = select(Favorite).filter(Favorite.user == user_id, Favorite.product == product_id)
-        favorite_data = await session.execute(query)
-
-        try:
-            favorite_data.scalar_one()
-            return True
-        except NoResultFound:
-            return False

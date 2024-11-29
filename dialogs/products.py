@@ -2,12 +2,14 @@ from aiogram import F
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Cancel, Group, Button
+from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Row, SwitchTo
 from aiogram_dialog.widgets.text import Format, Multi, Const, Jinja
 
-from handlers.products import search_product, change_variations_mode, change_product, change_product_favorite
+from handlers.products import search_product, change_variations_mode, change_product, change_product_favorite, \
+    previous_search_page, next_search_page
 from states.states import ProductsDialogStates
 from utils.dialog import Translate, DataStaticMedia, CustomListGroup
+
 
 product_search = Window(
     Translate('product_get_id'),
@@ -18,8 +20,48 @@ product_search = Window(
 
 
 product_search_list = Window(
-    Translate('product_search'),
-    state=ProductsDialogStates.product_search
+    Translate(
+        'product_search',
+        when=lambda data, _0, _1: data['dialog_data']['have_search_result'],
+    ),
+    Translate(
+        'product_search_error',
+        when=lambda data, _0, _1: not data['dialog_data']['have_search_result'],
+    ),
+    CustomListGroup(
+        Button(
+            Format('{item[title]}'),
+            on_click=change_product,
+            id='search_result'
+        ),
+        id='search_results_list',
+        item_id_getter=lambda item: item['id'],
+        items=F['dialog_data']['search_products'],
+    ),
+    Row(
+        Button(
+            Const('<'),
+            id='products_search_back',
+            when=lambda data, _0, _1: data['dialog_data']['search_page'] > 1,
+            on_click=previous_search_page
+        ),
+        Button(
+            Format('{dialog_data[search_page]}'),
+            id='products_search_page',
+        ),
+        Button(
+            Const('>'),
+            id='products_search_next',
+            on_click=next_search_page
+        ),
+        when=lambda data, _0, _1: data['dialog_data']['have_search_result'],
+    ),
+    SwitchTo(
+        Translate('back'),
+        id='products_search_cancel',
+        state=ProductsDialogStates.product_get_id
+    ),
+    state=ProductsDialogStates.product_search,
 )
 
 
@@ -98,7 +140,6 @@ product_detail = Window(
     Group(
         Button(
             Translate('product_no_variations'),
-            on_click=change_variations_mode,
             id='product_no_variations'
         ),
         Button(
