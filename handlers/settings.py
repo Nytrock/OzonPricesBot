@@ -2,8 +2,7 @@ from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
 
-from database.methods import update_have_card, update_show_product_image, update_show_variations, \
-    update_send_notifications
+from database.methods import update_have_card, update_show_variations, update_send_notifications
 
 
 async def update_user_have_card(_: CallbackQuery, button: Button, manager: DialogManager) -> None:

@@ -19,7 +19,7 @@ async def get_admin_statistic(**kwargs) -> dict[str, Any]:
     return data
 
 
-async def add_new_admin(message: Message, _: MessageInput, manager: DialogManager):
+async def add_new_admin(message: Message, _: MessageInput, manager: DialogManager) -> None:
     config = load_config().tg_api
     async with Client(config.username, api_id=config.api_id, api_hash=config.api_hash) as ubot:
         try:

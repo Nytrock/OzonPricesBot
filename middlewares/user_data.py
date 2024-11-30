@@ -1,7 +1,7 @@
 from typing import Any, Awaitable, Callable, Dict
 
 from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject, User
+from aiogram.types import TelegramObject
 
 from database.methods import get_user
 from enums.user_data import UserRole

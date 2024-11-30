@@ -16,7 +16,7 @@ from utils.url_parser import get_product_id_from_url
 VARIATIONS_ROWS_COUNT = 6
 
 
-async def product_detail_start(**kwargs):
+async def product_detail_start(**kwargs) -> dict[str, Any]:
     manager = kwargs['dialog_manager']
     if manager.start_data:
         for key, value in manager.start_data.items():
@@ -32,7 +32,7 @@ async def product_detail_start(**kwargs):
     return {'variations_limit': variations_limit}
 
 
-async def search_product(message: Message, _: MessageInput, manager: DialogManager):
+async def search_product(message: Message, _: MessageInput, manager: DialogManager) -> None:
     text = message.text
     if text.isdigit():
         product_id = int(text)
@@ -54,7 +54,7 @@ async def search_product(message: Message, _: MessageInput, manager: DialogManag
             await manager.switch_to(ProductsDialogStates.product_detail)
 
 
-async def change_variations_mode(_0: CallbackQuery, _1: Button, manager: DialogManager):
+async def change_variations_mode(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['variations_mode'] = not manager.dialog_data['variations_mode']
     manager.dialog_data['page_num'] = 1
     manager.dialog_data['variation_pages'] = math.ceil(
@@ -62,14 +62,14 @@ async def change_variations_mode(_0: CallbackQuery, _1: Button, manager: DialogM
     )
 
 
-async def change_product(callback: CallbackQuery, _: Button, manager: DialogManager):
+async def change_product(callback: CallbackQuery, _: Button, manager: DialogManager) -> None:
     product_id = int(callback.item_id)
     product_data = await get_product_info(product_id)
     await add_product_data_to_dialog(callback.from_user.id, product_data, manager)
     await manager.switch_to(ProductsDialogStates.product_detail)
 
 
-async def add_product_data_to_dialog(user_id: int, product_data: dict[str, Any], manager: DialogManager):
+async def add_product_data_to_dialog(user_id: int, product_data: dict[str, Any], manager: DialogManager) -> None:
     await limit_product_data_variations(product_data, manager)
     manager.dialog_data['product'] = product_data
     manager.dialog_data['variations_mode'] = False
@@ -99,24 +99,24 @@ async def limit_product_data_variations(product_data: dict[str, Any], manager: D
     product_data['variations'] = limit_variations
 
 
-async def change_image_url(_0: CallbackQuery, _1: Button, manager: DialogManager):
+async def change_image_url(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     if manager.dialog_data['image_url'] == manager.dialog_data['graph_url']:
         manager.dialog_data['image_url'] = manager.dialog_data['product']['image']
     else:
         manager.dialog_data['image_url'] = manager.dialog_data['graph_url']
 
 
-async def next_search_page(_0: CallbackQuery, _1: Button, manager: DialogManager):
+async def next_search_page(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['search_page'] += 1
     await get_search_page_data(manager)
 
 
-async def previous_search_page(_0: CallbackQuery, _1: Button, manager: DialogManager):
+async def previous_search_page(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['search_page'] -= 1
     await get_search_page_data(manager)
 
 
-async def get_search_page_data(manager: DialogManager):
+async def get_search_page_data(manager: DialogManager) -> None:
     page_num = manager.dialog_data['search_page']
     query = manager.dialog_data['search_query']
 
@@ -138,9 +138,9 @@ async def change_product_favorite(callback: CallbackQuery, _: Button, manager: D
     manager.dialog_data['into_favorites'] = favorite_created
 
 
-async def previous_variations(_0: CallbackQuery, _1: Button, manager: DialogManager):
+async def previous_variations(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['page_num'] -= 1
 
 
-async def next_variations(_0: CallbackQuery, _1: Button, manager: DialogManager):
+async def next_variations(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['page_num'] += 1

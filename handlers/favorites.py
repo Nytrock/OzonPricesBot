@@ -29,15 +29,15 @@ async def get_favorites(**kwargs) -> dict[str, Any]:
     return {'favorites': favorites}
 
 
-async def previous_favorites(_0: CallbackQuery, _1: Button, manager: DialogManager):
+async def previous_favorites(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['page_num'] -= 1
 
 
-async def next_favorites(_0: CallbackQuery, _1: Button, manager: DialogManager):
+async def next_favorites(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['page_num'] += 1
 
 
-async def open_favorite_product(callback: CallbackQuery, _: Button, manager: DialogManager):
+async def open_favorite_product(callback: CallbackQuery, _: Button, manager: DialogManager) -> None:
     product_id = int(callback.item_id)
     product_data = await get_product_info(product_id)
 
@@ -45,7 +45,7 @@ async def open_favorite_product(callback: CallbackQuery, _: Button, manager: Dia
     await manager.start(ProductsDialogStates.product_detail, data=manager.dialog_data)
 
 
-async def remove_favorite_product(callback: CallbackQuery, _: Button, manager: DialogManager):
+async def remove_favorite_product(callback: CallbackQuery, _: Button, manager: DialogManager) -> None:
     product_id = int(callback.item_id)
     user_id = manager.event.from_user.id
     await remove_favorite(user_id, product_id)

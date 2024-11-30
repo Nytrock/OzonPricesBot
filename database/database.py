@@ -16,7 +16,7 @@ class Base(DeclarativeBase):
     pass
 
 
-async def create_tables():
+async def create_tables() -> None:
     async with engine.begin() as conn:
         from .models import User, Product, Price, Favorite
         await conn.run_sync(Base.metadata.create_all)
