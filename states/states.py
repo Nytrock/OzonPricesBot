@@ -22,7 +22,6 @@ class SettingsDialogStates(StatesGroup):
     all_settings = State()
     have_card = State()
     show_variants = State()
-    show_image = State()
     send_notifications = State()
 
 

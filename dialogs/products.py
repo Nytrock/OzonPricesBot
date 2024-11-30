@@ -2,14 +2,12 @@ from aiogram import F
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Row, SwitchTo, Back
+from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Row, SwitchTo, Back, Column
 from aiogram_dialog.widgets.text import Format, Multi, Const, Jinja
-
 from handlers.products import search_product, change_variations_mode, change_product, change_product_favorite, \
-    previous_search_page, next_search_page, product_detail_start, previous_variations, next_variations
+    previous_search_page, next_search_page, product_detail_start, previous_variations, next_variations, change_image_url
 from states.states import ProductsDialogStates
 from utils.dialog import Translate, DataStaticMedia, CustomListGroup
-
 
 product_search = Window(
     Translate('product_get_id'),
@@ -67,9 +65,8 @@ product_search_list = Window(
 
 product_detail = Window(
     DataStaticMedia(
-        url='{dialog_data[product][image]}',
+        url='{dialog_data[image_url]}',
         type=ContentType.PHOTO,
-        when=lambda data, _0, _1: data['middleware_data']['user_show_image']
     ),
     Jinja(
         '<b><a href="https://www.ozon.ru/product/{{ dialog_data.product.id }}">{{ dialog_data.product.title }}</a></b>'
@@ -87,21 +84,35 @@ product_detail = Window(
     Translate('product_rating_count'),
     Group(
         Button(
-            Translate('product_show_variations'),
-            on_click=change_variations_mode,
-            id='product_show_variations'
+            Translate('product_show_image'),
+            on_click=change_image_url,
+            id='product_change_image',
+            when=lambda data, _0, _1: data['dialog_data']['image_url'] == data['dialog_data']['graph_url']
         ),
         Button(
-            Translate('product_to_favorites'),
-            on_click=change_product_favorite,
-            id='product_to_favorites',
-            when=lambda data, _0, _1: not data['dialog_data']['into_favorites']
+            Translate('product_show_graph'),
+            on_click=change_image_url,
+            id='product_change_image',
+            when=lambda data, _0, _1: data['dialog_data']['image_url'] != data['dialog_data']['graph_url']
         ),
-        Button(
-            Translate('product_from_favorites'),
-            on_click=change_product_favorite,
-            id='product_from_favorites',
-            when=lambda data, _0, _1: data['dialog_data']['into_favorites']
+        Row(
+            Button(
+                Translate('product_show_variations'),
+                on_click=change_variations_mode,
+                id='product_show_variations'
+            ),
+            Button(
+                Translate('product_to_favorites'),
+                on_click=change_product_favorite,
+                id='product_to_favorites',
+                when=lambda data, _0, _1: not data['dialog_data']['into_favorites']
+            ),
+            Button(
+                Translate('product_from_favorites'),
+                on_click=change_product_favorite,
+                id='product_from_favorites',
+                when=lambda data, _0, _1: data['dialog_data']['into_favorites']
+            ),
         ),
         Cancel(
             Translate('close'),
@@ -113,7 +124,6 @@ product_detail = Window(
             id='products_detail_back',
             when=lambda data, _0, _1: data['dialog_data'].get('have_search_result')
         ),
-        width=2,
         when=lambda data, _0, _1: not data['dialog_data']['variations_mode']
     ),
     Group(
@@ -146,6 +156,7 @@ product_detail = Window(
             Button(
                 Format('{dialog_data[page_num]}/{dialog_data[variation_pages]}'),
                 id='variations_page',
+                when=lambda data, _0, _1: data['dialog_data']['variation_pages'] > 1
             ),
             Button(
                 Const('>'),

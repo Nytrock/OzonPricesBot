@@ -9,3 +9,5 @@ aiogram-dialog==2.2.0
 aiogram_dialog~=2.2.0
 Pyrogram~=2.0.106
 TgCrypto==1.2.5
+matplotlib~=3.9.2
+pillow~=11.0.0

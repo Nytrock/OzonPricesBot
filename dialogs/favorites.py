@@ -29,6 +29,7 @@ favorites_show = Window(
         Button(
             Format('{dialog_data[page_num]}/{dialog_data[max_pages]}'),
             id='favorites_page',
+            when=lambda data, _0, _1: data['dialog_data']['max_pages'] > 1
         ),
         Button(
             Const('>'),
@@ -36,12 +37,12 @@ favorites_show = Window(
             when=lambda data, _0, _1: data['dialog_data']['page_num'] < data['dialog_data']['max_pages'],
             on_click=next_favorites
         ),
-        when=lambda data, _0, _1: data['dialog_data']['max_pages'] > 0,
+        when=lambda data, _0, _1: data['dialog_data']['max_pages'] > 0
     ),
     Button(
         Translate('favorites_empty'),
         id='favorites_empty',
-        when=lambda data, _0, _1: data['dialog_data']['max_pages'] == 0,
+        when=lambda data, _0, _1: data['dialog_data']['max_pages'] == 0
     ),
     Row(
         Cancel(
@@ -52,7 +53,7 @@ favorites_show = Window(
             Translate('favorites_edit_button'),
             id='favorites_edit',
             state=FavoritesDialogStates.favorites_edit,
-            when=lambda data, _0, _1: data['dialog_data']['max_pages'] > 0,
+            when=lambda data, _0, _1: data['dialog_data']['max_pages'] > 0
         ),
     ),
     state=FavoritesDialogStates.favorites_show,

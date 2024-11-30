@@ -16,7 +16,6 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(default=False)
     have_card: Mapped[bool]
     show_variations: Mapped[int]
-    show_product_image: Mapped[bool]
     send_notifications: Mapped[int]
 
     favorite_products: Mapped[list['Product']] = relationship(
@@ -53,6 +52,7 @@ class Price(Base):
     date: Mapped[datetime.date] = mapped_column(default=datetime.date.today())
     card_price: Mapped[int]
     regular_price: Mapped[int]
+    in_stock: Mapped[bool]
 
 
 class Favorite(Base):

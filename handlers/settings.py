@@ -20,13 +20,6 @@ async def update_user_show_variations(_: CallbackQuery, button: Button, manager:
     await update_show_variations(user_id, show_variations)
 
 
-async def update_user_show_image(_: CallbackQuery, button: Button, manager: DialogManager) -> None:
-    user_id = manager.event.from_user.id
-    show_image = button.widget_id == 'on'
-    manager.middleware_data['user_show_image'] = show_image
-    await update_show_product_image(user_id, show_image)
-
-
 async def update_user_send_notifications(_: CallbackQuery, button: Button, manager: DialogManager) -> None:
     user_id = manager.event.from_user.id
     send_notifications = int(button.widget_id)

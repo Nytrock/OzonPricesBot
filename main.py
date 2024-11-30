@@ -7,6 +7,7 @@ from aiogram_dialog import setup_dialogs
 from config_data.config import Config, load_config
 from database.database import create_tables
 from dialogs import main_menu, admin, settings, favorites, products
+from dialogs.message_manager import CustomMessageManager
 from handlers import registration, other_commands
 from lexicon.lexicon import LEXICON
 from middlewares.i18n import TranslatorMiddleware
@@ -35,7 +36,7 @@ async def main():
     dp.include_router(settings.dialog)
     dp.include_router(favorites.dialog)
     dp.include_router(products.dialog)
-    setup_dialogs(dp)
+    setup_dialogs(dp, message_manager=CustomMessageManager())
 
     await bot.delete_webhook()
     await dp.start_polling(bot)

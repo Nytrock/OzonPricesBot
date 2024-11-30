@@ -21,6 +21,7 @@ async def product_detail_start(**kwargs):
     if manager.start_data:
         for key, value in manager.start_data.items():
             manager.dialog_data[key] = value
+        manager.start_data.clear()
 
     variations_limit = []
     if manager.dialog_data['variations_mode']:
@@ -72,6 +73,11 @@ async def add_product_data_to_dialog(user_id: int, product_data: dict[str, Any],
     await limit_product_data_variations(product_data, manager)
     manager.dialog_data['product'] = product_data
     manager.dialog_data['variations_mode'] = False
+    manager.dialog_data['graph_url'] = (f'graph://{product_data["id"]}'
+                                        f'&{product_data["title"]}'
+                                        f'&{manager.middleware_data["user_have_card"]}'
+                                        f'&{manager.middleware_data["i18n"]}')
+    manager.dialog_data['image_url'] = manager.dialog_data['graph_url']
     manager.dialog_data['have_variations'] = bool(product_data['variations'])
     manager.dialog_data['into_favorites'] = await is_favorite_exists(user_id, product_data['id'])
 
@@ -91,6 +97,13 @@ async def limit_product_data_variations(product_data: dict[str, Any], manager: D
             limit_variations.append(variation)
 
     product_data['variations'] = limit_variations
+
+
+async def change_image_url(_0: CallbackQuery, _1: Button, manager: DialogManager):
+    if manager.dialog_data['image_url'] == manager.dialog_data['graph_url']:
+        manager.dialog_data['image_url'] = manager.dialog_data['product']['image']
+    else:
+        manager.dialog_data['image_url'] = manager.dialog_data['graph_url']
 
 
 async def next_search_page(_0: CallbackQuery, _1: Button, manager: DialogManager):

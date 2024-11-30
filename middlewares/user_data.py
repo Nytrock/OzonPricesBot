@@ -26,6 +26,5 @@ class UserDataMiddleware(BaseMiddleware):
             data['user_have_card'] = user.have_card
             data['user_show_variations'] = user.show_variations
             data['user_send_notifications'] = user.send_notifications
-            data['user_show_image'] = user.show_product_image
 
         return await handler(event, data)

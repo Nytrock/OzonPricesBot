@@ -18,7 +18,7 @@ class TranslatorMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         user_lang = user.language_code
-        translations = data.get('translations')
+        translations = data.pop('translations')
 
         i18n = translations.get(user_lang)
         if i18n is None:

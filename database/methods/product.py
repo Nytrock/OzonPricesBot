@@ -55,6 +55,7 @@ async def get_data_from_product(product: Product) -> dict[str, Any]:
         price = price_obj.scalar_one()
         product_data['card_price'] = price.card_price
         product_data['regular_price'] = price.regular_price
+        product_data['in_stock'] = price.in_stock
 
         query = select(Product).filter(Product.product_group == product.product_group, Product.id != product.id)
         variations_obj = await session.execute(query)

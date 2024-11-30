@@ -30,6 +30,8 @@ class DataStaticMedia(StaticMedia):
         super().__init__(path=path, url=url, type=type, use_pipe=use_pipe, media_params=media_params, when=when)
         if self.url is not None:
             self.url = Format(self.url.text)
+        if self.path is not None:
+            self.path = Format(self.path.text)
 
 
 def create_enum_select(enum_type: EnumType, middleware_param: str, on_click: Callable) -> list[Button]:

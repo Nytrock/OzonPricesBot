@@ -34,8 +34,7 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
         return {}
 
     out_of_stock_div = product_soup.find(attrs={'data-widget' : 'webOutOfStock'})
-    if out_of_stock_div is not None:
-        return result
+    result['in_stock'] = out_of_stock_div is None
 
     prices = price_div.get_text()
     for text in prices.split(' '):
@@ -62,7 +61,7 @@ async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
     product_soup = get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
     result |= get_product_prices_from_soup(product_soup)
 
-    if result.get('regular_price') is None:
+    if result is None:
         return {}
 
     info_div = product_soup.find('script', attrs={'type': 'application/ld+json'})

@@ -3,18 +3,13 @@ from aiogram_dialog.widgets.kbd import Cancel, SwitchTo, Row, Button
 from aiogram_dialog.widgets.text import Multi, Format, Const
 
 from enums.user_data import UserShowVariations, UserSendNotifications
-from handlers.settings import update_user_show_image, update_user_have_card, update_user_show_variations, \
+from handlers.settings import update_user_have_card, update_user_show_variations, \
     update_user_send_notifications
 from states.states import SettingsDialogStates
 from utils.dialog import Translate, create_enum_select
 
 all_settings = Window(
     Translate('settings_all'),
-    SwitchTo(
-        Translate('settings_show_image'),
-        id='show_image_change',
-        state=SettingsDialogStates.show_image
-    ),
     Row(
         SwitchTo(
             Translate('settings_have_card'),
@@ -80,37 +75,6 @@ show_variations = Window(
 )
 
 
-show_image = Window(
-    Translate('show_image_description'),
-    Button(
-        Multi(
-            Const('[x]'),
-            Translate('show_image_checkbox'),
-            sep=' '
-        ),
-        id='off',
-        on_click=update_user_show_image,
-        when=lambda data, _0, _1: data['middleware_data']['user_show_image']
-    ),
-    Button(
-        Multi(
-            Const('[ ]'),
-            Translate('show_image_checkbox'),
-            sep=' '
-        ),
-        id='on',
-        on_click=update_user_show_image,
-        when=lambda data, _0, _1: not data['middleware_data']['user_show_image']
-    ),
-    SwitchTo(
-        Translate('back'),
-        id='show_image_back',
-        state=SettingsDialogStates.all_settings
-    ),
-    state=SettingsDialogStates.show_image
-)
-
-
 send_notifications = Window(
     Translate('send_notifications_description'),
     *create_enum_select(UserSendNotifications, 'user_send_notifications', update_user_send_notifications),
@@ -127,6 +91,5 @@ dialog = Dialog(
     all_settings,
     have_card,
     show_variations,
-    show_image,
     send_notifications,
 )
