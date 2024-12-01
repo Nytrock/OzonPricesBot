@@ -15,19 +15,19 @@ SEARCH_RESULTS_COUNT = 8
 PRICE_SYMBOLS = [' ', '₽']
 
 
-def get_page_soup(url: str) -> BeautifulSoup:
+async def get_page_soup(url: str) -> BeautifulSoup:
     session = requests.Session()
     response = session.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
     return soup
 
 
-def get_product_prices_by_id(product_id: int) -> dict[str, int]:
-    product_soup = get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
-    return get_product_prices_from_soup(product_soup)
+async def get_product_prices_from_ozon(product_id: int) -> dict[str, int]:
+    product_soup = await get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
+    return await get_product_prices_from_soup(product_soup)
 
 
-def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
+async def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
     result = {'regular_price': -1, 'card_price': -1}
     price_div = product_soup.find(attrs={'data-widget' : 'webPrice'})
     if price_div is None:
@@ -58,8 +58,8 @@ def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
 
 async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
     result = {'id': product_id}
-    product_soup = get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
-    result |= get_product_prices_from_soup(product_soup)
+    product_soup = await get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
+    result |= await get_product_prices_from_soup(product_soup)
 
     if result is None:
         return {}

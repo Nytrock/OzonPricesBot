@@ -11,3 +11,4 @@ Pyrogram~=2.0.106
 TgCrypto==1.2.5
 matplotlib~=3.9.2
 pillow~=11.0.0
+APScheduler~=3.11.0

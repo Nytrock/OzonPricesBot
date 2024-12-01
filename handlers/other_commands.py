@@ -12,7 +12,6 @@ router.message.filter(IsUserRegistered())
 
 @router.message(CommandStart())
 async def start_main_menu(message: Message, dialog_manager: DialogManager):
-    print(1)
     await dialog_manager.start(MainMenuDialogStates.main_menu, mode=StartMode.RESET_STACK)
 
 

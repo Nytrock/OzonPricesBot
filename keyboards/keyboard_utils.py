@@ -1,5 +1,8 @@
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+
+from callback_factory.callback_factory import ProductCallbackFactory
+from database.models import Product
 
 
 def create_reply_kb(i18n: dict[str, str], width: int, *args: str, **kwargs: str) -> ReplyKeyboardMarkup:
@@ -22,3 +25,17 @@ def create_reply_kb(i18n: dict[str, str], width: int, *args: str, **kwargs: str)
         resize_keyboard=True,
     )
 
+def create_notification_kb(product_id: int,  i18n: dict[str, str]):
+    kb_builder = InlineKeyboardBuilder()
+
+    button_product = InlineKeyboardButton(
+        text=i18n['notification_button'],
+        callback_data=ProductCallbackFactory(
+            product_id=product_id,
+        ).pack()
+    )
+
+    kb_builder.row(button_product)
+    return kb_builder.as_markup(
+        resize_keyboard=True,
+    )

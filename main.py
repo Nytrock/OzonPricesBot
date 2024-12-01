@@ -8,10 +8,11 @@ from config_data.config import Config, load_config
 from database.database import create_tables
 from dialogs import main_menu, admin, settings, favorites, products
 from dialogs.message_manager import CustomMessageManager
-from handlers import registration, other_commands
+from handlers import registration, other_commands, factory_callbacks
 from lexicon.lexicon import LEXICON
 from middlewares.i18n import TranslatorMiddleware
 from middlewares.user_data import UserDataMiddleware
+from schedulers import price_updater
 
 
 async def main():
@@ -19,14 +20,16 @@ async def main():
     storage = MemoryStorage()
 
     bot = Bot(token=config.tg_bot.token)
-    dp = Dispatcher(storage=storage)
+    dp = Dispatcher(
+        storage=storage,
+        translations=LEXICON
+    )
 
     await create_tables()
 
-    dp['translations'] = LEXICON
-
     dp.include_router(registration.router)
     dp.include_router(other_commands.router)
+    dp.include_router(factory_callbacks.router)
 
     dp.update.outer_middleware(UserDataMiddleware())
     dp.update.middleware(TranslatorMiddleware())
@@ -36,7 +39,9 @@ async def main():
     dp.include_router(settings.dialog)
     dp.include_router(favorites.dialog)
     dp.include_router(products.dialog)
+
     setup_dialogs(dp, message_manager=CustomMessageManager())
+    price_updater.setup_scheduler(bot)
 
     await bot.delete_webhook()
     await dp.start_polling(bot)

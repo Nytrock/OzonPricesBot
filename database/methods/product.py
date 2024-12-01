@@ -2,6 +2,7 @@ from typing import Any
 
 from sqlalchemy import select, insert
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import selectinload
 
 from exernal_services.ozon_scrapper import get_product_data_from_ozon
 from .price import create_product_price
@@ -13,7 +14,14 @@ async def get_all_products() -> list[Product]:
     async with session_factory() as session:
         query = select(Product)
         result = await session.execute(query)
-        return result.all()
+        return result.scalars().all()
+
+
+async def get_all_products_with_users_favorite() -> list[Product]:
+    async with session_factory() as session:
+        query = select(Product).options(selectinload(Product.users_favorite))
+        result = await session.execute(query)
+        return result.scalars().all()
 
 
 async def get_all_sellers() -> list[Seller]:

@@ -22,7 +22,7 @@ class TranslatorMiddleware(BaseMiddleware):
 
         i18n = translations.get(user_lang)
         if i18n is None:
-            data['i18n'] = translations['default']
+            data['i18n'] = translations[translations['default']]
         else:
             data['i18n'] = i18n
 

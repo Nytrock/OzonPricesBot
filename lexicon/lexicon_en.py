@@ -64,6 +64,8 @@ LEXICON_EN: dict[str, str] = {
     'product_show_graph': '📈 Show price chart.',
     'favorites_edit_button': '✏️ Edit',
     'favorites_empty': 'You have no products in favorites.',
+    'notification': '🔔 Price on product {product} changed from {old_price} to {new_price}!',
+    'notification_button': 'Open product page',
     'graph_green': 'In stock',
     'graph_gray': 'Out of stock',
     'cancel': '❌ Cancel',
