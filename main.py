@@ -12,7 +12,7 @@ from handlers import registration, other_commands, factory_callbacks
 from lexicon.lexicon import LEXICON
 from middlewares.i18n import TranslatorMiddleware
 from middlewares.user_data import UserDataMiddleware
-from schedulers import price_updater
+from schedulers import product_updater
 
 
 async def main():
@@ -41,7 +41,7 @@ async def main():
     dp.include_router(products.dialog)
 
     setup_dialogs(dp, message_manager=CustomMessageManager())
-    price_updater.setup_scheduler(bot)
+    product_updater.setup_scheduler(bot)
 
     await bot.delete_webhook()
     await dp.start_polling(bot)

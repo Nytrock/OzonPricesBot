@@ -2,9 +2,9 @@ from aiogram import F
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog
 from aiogram_dialog.widgets.input import MessageInput
-from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Row, SwitchTo, Back, Column
+from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Row, Back
 from aiogram_dialog.widgets.media import StaticMedia
-from aiogram_dialog.widgets.text import Format, Multi, Const, Jinja
+from aiogram_dialog.widgets.text import Format, Multi, Const
 from handlers.products import search_product, change_variations_mode, change_product, change_product_favorite, \
     previous_search_page, next_search_page, product_detail_start, previous_variations, next_variations, change_image_url
 from states.states import ProductsDialogStates
@@ -55,10 +55,9 @@ product_search_list = Window(
         ),
         when=lambda data, _0, _1: data['dialog_data']['have_search_result'],
     ),
-    SwitchTo(
+    Cancel(
         Translate('back'),
-        id='products_search_cancel',
-        state=ProductsDialogStates.product_get_id
+        id='products_search_cancel'
     ),
     state=ProductsDialogStates.product_search,
 )
@@ -69,8 +68,8 @@ product_detail = Window(
         url=Format('{dialog_data[image_url]}'),
         type=ContentType.PHOTO,
     ),
-    Jinja(
-        '<b><a href="https://www.ozon.ru/product/{{ dialog_data.product.id }}">{{ dialog_data.product.title }}</a></b>'
+    Format(
+        '[{dialog_data[product][title]}](https://www.ozon.ru/product/{dialog_data[product][id]})'
     ),
     Const(' '),
     Translate(
@@ -81,6 +80,7 @@ product_detail = Window(
         'product_price_no_card',
         when=lambda data, _0, _1: not data['middleware_data']['user_have_card']
     ),
+    Translate('product_article'),
     Const(' '),
     Translate('product_rating_count'),
     Group(
@@ -185,7 +185,7 @@ product_detail = Window(
         ),
         when=lambda data, _0, _1: data['dialog_data']['variations_mode'] and not data['dialog_data']['have_variations']
     ),
-    parse_mode='HTML',
+    parse_mode='Markdown',
     state=ProductsDialogStates.product_detail,
     getter=product_detail_start
 )

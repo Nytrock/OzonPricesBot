@@ -45,6 +45,16 @@ async def get_product_info(product_id: int) -> dict[str, Any]:
             return product_data
 
 
+async def update_product(product_data: dict[str, Any]):
+    async with session_factory() as session:
+        product = await session.get(Product, product_data['id'])
+        product.title = product_data['title']
+        product.rating = product_data['rating']
+        product.rating_count = product_data['rating_count']
+        product.description = product_data['description']
+        await session.commit()
+
+
 async def get_data_from_product(product: Product) -> dict[str, Any]:
     product_data = {
         'id': product.id,
@@ -58,7 +68,7 @@ async def get_data_from_product(product: Product) -> dict[str, Any]:
     }
 
     async with session_factory() as session:
-        query = select(Price).filter(Price.product == product.id).order_by(Price.date.desc()).limit(1)
+        query = select(Price).filter(Price.product == product.id).order_by(Price.datetime.desc()).limit(1)
         price_obj = await session.execute(query)
         price = price_obj.scalar_one()
         product_data['card_price'] = price.card_price
@@ -70,7 +80,7 @@ async def get_data_from_product(product: Product) -> dict[str, Any]:
         variations = variations_obj.scalars()
 
         for variation in variations:
-            query = select(Price).filter(Price.product == variation.id).order_by(Price.date.desc()).limit(1)
+            query = select(Price).filter(Price.product == variation.id).order_by(Price.datetime.desc()).limit(1)
             variation_price = (await session.execute(query)).scalar_one()
             data = {
                 'id': variation.id,

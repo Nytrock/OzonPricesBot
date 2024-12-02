@@ -1,11 +1,9 @@
 import asyncio
 
-from exernal_services.ozon_scrapper import get_product_data_from_ozon, get_products_by_search
+from exernal_services.ozon_scrapper import get_product_data_from_ozon
 
 async def main():
-    print(await get_product_data_from_ozon(1505354070))
-    print(await get_product_data_from_ozon(1580742819))
-    print(await get_product_data_from_ozon(1580632102))
-
+    for i in range(100000000, 9999999999):
+        print(await get_product_data_from_ozon(i))
 
 asyncio.run(main())

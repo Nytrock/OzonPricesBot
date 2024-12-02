@@ -1,4 +1,3 @@
-import datetime
 from typing import Any
 
 from aiogram import Bot
@@ -7,17 +6,18 @@ from apscheduler.triggers.interval import IntervalTrigger
 from pyrogram import Client
 
 from config_data.config import load_config
-from database.methods import get_product_prices, create_product_price, get_all_products_with_users_favorite
+from database.methods import get_product_prices, create_product_price, get_all_products_with_users_favorite, \
+    update_product
 from database.models import Product, Price
 from enums.user_data import UserSendNotifications
-from exernal_services.ozon_scrapper import get_product_prices_from_ozon
+from exernal_services.ozon_scrapper import get_product_data_from_ozon
 from keyboards.keyboard_utils import create_notification_kb
 from lexicon.lexicon import LEXICON
 
 
 def setup_scheduler(bot: Bot) -> None:
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(update_prices, IntervalTrigger(days=1), args=(bot, ), next_run_time=datetime.datetime.now())
+    scheduler.add_job(update_prices, IntervalTrigger(hours=6), args=(bot,))
     scheduler.start()
 
 
@@ -29,10 +29,9 @@ async def update_prices(bot: Bot) -> None:
     for product in products:
         prices = await get_product_prices(product.id)
         last_price = prices[-1]
-        if last_price.date == datetime.date.today():
-            continue
 
-        price_data = await get_product_prices_from_ozon(product.id)
+        price_data = await get_product_data_from_ozon(product.id)
+        await update_product(price_data)
         if price_data['regular_price'] != last_price.regular_price or price_data['card_price'] != last_price.card_price:
             price_data['id'] = product.id
             await create_product_price(price_data)

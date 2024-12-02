@@ -1,7 +1,8 @@
-import datetime
 from typing import Annotated
 
-from sqlalchemy import String, ForeignKey
+from datetime import datetime
+
+from sqlalchemy import String, ForeignKey, DateTime, Column, func
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from .database import Base
@@ -49,7 +50,7 @@ class Price(Base):
 
     id: Mapped[pk]
     product: Mapped[int] = mapped_column(ForeignKey('product.id', ondelete='CASCADE'))
-    date: Mapped[datetime.date] = mapped_column(default=datetime.date.today())
+    datetime = Column(DateTime(timezone=True), default=datetime.now())
     card_price: Mapped[int]
     regular_price: Mapped[int]
     in_stock: Mapped[bool]

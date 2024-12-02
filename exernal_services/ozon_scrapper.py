@@ -22,11 +22,6 @@ async def get_page_soup(url: str) -> BeautifulSoup:
     return soup
 
 
-async def get_product_prices_from_ozon(product_id: int) -> dict[str, int]:
-    product_soup = await get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
-    return await get_product_prices_from_soup(product_soup)
-
-
 async def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
     result = {'regular_price': -1, 'card_price': -1}
     price_div = product_soup.find(attrs={'data-widget' : 'webPrice'})
@@ -61,7 +56,7 @@ async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
     product_soup = await get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
     result |= await get_product_prices_from_soup(product_soup)
 
-    if result is None:
+    if result.get('regular_price') is None:
         return {}
 
     info_div = product_soup.find('script', attrs={'type': 'application/ld+json'})
