@@ -1,8 +1,10 @@
 from aiogram import Router
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import CommandStart, Command, StateFilter
+from aiogram.fsm.state import default_state
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, StartMode
 
+from dialogs.main_menu import dialog
 from filters.registration import IsUserRegistered
 from states.states import MainMenuDialogStates
 
@@ -23,8 +25,3 @@ async def registration_command_error(message: Message, i18n: dict[str, str]):
 @router.message(Command('help'))
 async def registration_command_error(message: Message, i18n: dict[str, str]):
     await message.answer(text=i18n.get('help_command'))
-
-
-@router.message()
-async def random_message(message: Message, i18n: dict[str, str]):
-    await message.answer(text=i18n.get('random_message'))

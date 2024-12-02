@@ -45,6 +45,7 @@ async def search_product(message: Message, _: MessageInput, manager: DialogManag
         manager.dialog_data['search_data'] = []
         await get_search_page_data(manager)
         await manager.switch_to(ProductsDialogStates.product_search)
+        await message.delete()
     else:
         product_data = await get_product_info(product_id)
         if product_data == {}:
@@ -52,6 +53,7 @@ async def search_product(message: Message, _: MessageInput, manager: DialogManag
         else:
             await add_product_data_to_dialog(message.from_user.id, product_data, manager)
             await manager.switch_to(ProductsDialogStates.product_detail)
+            await message.delete()
 
 
 async def change_variations_mode(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:

@@ -88,7 +88,7 @@ async def create_product(product_data: dict[str, Any]) -> None:
     async with session_factory() as session:
         variations = list(product_data.pop('variations'))
         product_data_to_create = product_data.copy()
-        for key in ['card_price', 'regular_price']:
+        for key in ['card_price', 'regular_price', 'in_stock']:
             product_data_to_create.pop(key)
 
         seller_name = product_data_to_create.pop('seller')

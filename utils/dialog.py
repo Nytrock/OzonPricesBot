@@ -1,14 +1,11 @@
 from enum import EnumType
-from pathlib import Path
-from typing import Callable, Union, Any
+from typing import Callable, Any
 
-from aiogram.enums import ContentType
 from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogProtocol, DialogManager, SubManager
 from aiogram_dialog.api.internal import RawKeyboard
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.kbd import Button, ListGroup
-from aiogram_dialog.widgets.media import StaticMedia
 from aiogram_dialog.widgets.text import Format, Multi, Const, Text
 from aiogram_dialog.widgets.text.format import _FormatDataStub
 
@@ -21,17 +18,6 @@ class Translate(Format):
         if manager.is_preview():
             return self.text.format_map(_FormatDataStub(data=data)).format_map(_FormatDataStub(data=data))
         return self.text.format_map(data).format_map(data)
-
-
-class DataStaticMedia(StaticMedia):
-    def __init__(self, *, path: Union[Text, str, Path, None] = None, url: Union[Text, str, None] = None,
-                 type: ContentType = ContentType.PHOTO, use_pipe: bool = False, media_params: dict = None,
-                 when: WhenCondition = None, data=None):
-        super().__init__(path=path, url=url, type=type, use_pipe=use_pipe, media_params=media_params, when=when)
-        if self.url is not None:
-            self.url = Format(self.url.text)
-        if self.path is not None:
-            self.path = Format(self.path.text)
 
 
 def create_enum_select(enum_type: EnumType, middleware_param: str, on_click: Callable) -> list[Button]:

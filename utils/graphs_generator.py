@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 from database.methods import get_product_prices
+from database.models import Price
 
 
 async def get_price_graph(product_id: int, product_title: str, have_card: bool, i18n: dict[str, Any]) -> bytes:
@@ -38,23 +39,34 @@ async def get_price_graph(product_id: int, product_title: str, have_card: bool, 
 
         plt.plot(x, y, color=color, label=i18n[f'graph_{color}'])
 
-    if len(prices) == 1:
-        price = prices[0]
-        x = [price.date - datetime.timedelta(days=1), price.date]
+    external_prices = []
+    if prices[-1].date != datetime.datetime.now():
+        last_price = prices[-1]
+        fake_price = Price(
+            date=datetime.datetime.now(),
+            regular_price=last_price.regular_price,
+            card_price=last_price.card_price
+        )
+        external_prices = [last_price, fake_price]
+    elif len(prices) == 1:
+        external_prices = [prices[-1].date - datetime.timedelta(days=1), prices[-1].date]
+        plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=1))
+
+    if external_prices:
+        x = [external_prices[0].date, external_prices[1].date]
 
         if have_card:
-            y = [price.card_price, price.card_price]
+            y = [external_prices[0].card_price, external_prices[1].card_price]
         else:
-            y = [price.regular_price, price.regular_price]
+            y = [external_prices[0].regular_price, external_prices[1].regular_price]
 
-        if not price.in_stock:
+        if not external_prices[0].in_stock:
             color = 'gray'
         else:
             color = 'green'
 
         all_y.extend(y)
         plt.plot(x, y, color=color, label=i18n[f'graph_{color}'])
-        plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=1))
 
     all_y_labels = [f'{y} {i18n["rub"]}' for y in all_y]
     plt.yticks(all_y, all_y_labels)

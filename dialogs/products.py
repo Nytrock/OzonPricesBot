@@ -3,11 +3,12 @@ from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Cancel, Group, Button, Row, SwitchTo, Back, Column
+from aiogram_dialog.widgets.media import StaticMedia
 from aiogram_dialog.widgets.text import Format, Multi, Const, Jinja
 from handlers.products import search_product, change_variations_mode, change_product, change_product_favorite, \
     previous_search_page, next_search_page, product_detail_start, previous_variations, next_variations, change_image_url
 from states.states import ProductsDialogStates
-from utils.dialog import Translate, DataStaticMedia, CustomListGroup
+from utils.dialog import Translate, CustomListGroup
 
 product_search = Window(
     Translate('product_get_id'),
@@ -64,8 +65,8 @@ product_search_list = Window(
 
 
 product_detail = Window(
-    DataStaticMedia(
-        url='{dialog_data[image_url]}',
+    StaticMedia(
+        url=Format('{dialog_data[image_url]}'),
         type=ContentType.PHOTO,
     ),
     Jinja(
@@ -134,7 +135,7 @@ product_detail = Window(
                         'product_variant_have_card',
                         when=lambda data, _0, _1: data['middleware_data']['user_have_card']
                     ),
-                    Format(
+                    Translate(
                         'product_variant_no_card',
                         when=lambda data, _0, _1: not data['middleware_data']['user_have_card']
                     ),
