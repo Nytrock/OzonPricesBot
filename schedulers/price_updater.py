@@ -42,13 +42,13 @@ async def update_prices(bot: Bot) -> None:
 async def notification_users(product: Product, old_price: Price, new_price: dict[str, Any], bot: Bot):
     for user in product.users_favorite:
         if user.have_card:
-            old_price = old_price.card_price
-            new_price = new_price['card_price']
+            old_price_num = old_price.card_price
+            new_price_num = new_price['card_price']
         else:
-            old_price = old_price.regular_price
-            new_price = new_price['regular_price']
+            old_price_num = old_price.regular_price
+            new_price_num = new_price['regular_price']
 
-        if old_price == new_price:
+        if old_price_num == new_price_num:
             continue
 
         user_notifications_mode = UserSendNotifications(user.send_notifications)
@@ -56,7 +56,7 @@ async def notification_users(product: Product, old_price: Price, new_price: dict
 
         if user_notifications_mode == UserSendNotifications.no:
             send_user_notification = False
-        elif user_notifications_mode == UserSendNotifications.only_lowering and old_price < new_price:
+        elif user_notifications_mode == UserSendNotifications.only_lowering and old_price_num < new_price_num:
             send_user_notification = False
 
         if not send_user_notification:
@@ -71,8 +71,8 @@ async def notification_users(product: Product, old_price: Price, new_price: dict
 
         message_text = LEXICON[language_code]['notification'].format(
             product=product.title,
-            old_price=old_price,
-            new_price=new_price
+            old_price=old_price_num,
+            new_price=new_price_num
         )
         await bot.send_message(
             user.id,
