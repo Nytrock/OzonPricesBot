@@ -2,8 +2,16 @@ import asyncio
 
 from exernal_services.ozon_scrapper import get_product_data_from_ozon
 
-async def main():
-    for i in range(100000000, 9999999999):
-        print(await get_product_data_from_ozon(i))
 
+async def main():
+    print(await get_product_data_from_ozon(1667404254))
+    print(await get_product_data_from_ozon(1646643316))
+    print(await get_product_data_from_ozon(909110814))
+    print(await get_product_data_from_ozon(285813483))
+    print(await get_product_data_from_ozon(1))
+    print(await get_product_data_from_ozon(935358735))
+    print(await get_product_data_from_ozon(9872234))
+
+
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 asyncio.run(main())

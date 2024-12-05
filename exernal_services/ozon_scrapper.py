@@ -4,7 +4,7 @@ import textwrap
 
 from bs4 import BeautifulSoup
 from typing import Any
-from curl_cffi import requests
+from curl_cffi.requests import AsyncSession
 from utils.url_parser import get_product_id_from_inner_url
 
 PRODUCT_URL = 'https://www.ozon.ru/product'
@@ -16,10 +16,10 @@ PRICE_SYMBOLS = [' ', '₽']
 
 
 async def get_page_soup(url: str) -> BeautifulSoup:
-    session = requests.Session()
-    response = session.get(url)
-    soup = BeautifulSoup(response.text, 'lxml')
-    return soup
+    async with AsyncSession() as s:
+        response = await s.get(url)
+        soup = BeautifulSoup(response.text, 'lxml')
+        return soup
 
 
 async def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
@@ -119,9 +119,9 @@ async def get_products_by_search(text: str, page_index=1) -> list[dict[str, Any]
 
 
 async def get_search_data(url: str) -> dict[str, Any]:
-    session = requests.Session()
-    response = session.get(url)
-    data = json.loads(response.text)['widgetStates']
+    async with AsyncSession() as s:
+        response = await s.get(url)
+        data = json.loads(response.text)['widgetStates']
 
     result = {}
     for key in data.keys():

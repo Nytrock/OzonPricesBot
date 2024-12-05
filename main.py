@@ -47,4 +47,5 @@ async def main():
     await dp.start_polling(bot)
 
 
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 asyncio.run(main())
