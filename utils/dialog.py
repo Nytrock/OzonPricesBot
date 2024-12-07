@@ -1,4 +1,3 @@
-from enum import EnumType
 from typing import Callable, Any
 
 from aiogram.types import CallbackQuery
@@ -20,7 +19,7 @@ class Translate(Format):
         return self.text.format_map(data).format_map(data)
 
 
-def create_enum_select(enum_type: EnumType, middleware_param: str, on_click: Callable) -> list[Button]:
+def create_enum_select(enum_type, middleware_param: str, on_click: Callable) -> list[Button]:
     result = []
     for enum in enum_type:
         result.extend([

@@ -1,5 +1,5 @@
 import asyncio
-from aiogram.client.session.aiohttp import AiohttpSession
+import platform
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -19,11 +19,9 @@ from schedulers import product_updater
 async def main():
     config: Config = load_config()
     storage = MemoryStorage()
-    session = AiohttpSession(proxy='http://proxy.server:3128')
 
     bot = Bot(
         token=config.tg_bot.token,
-        session=session
     )
     dp = Dispatcher(
         storage=storage,
@@ -51,6 +49,7 @@ async def main():
     await bot.delete_webhook()
     await dp.start_polling(bot)
 
-
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-asyncio.run(main())
+if __name__ == "__main__":
+    if platform.system() == 'Windows':
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.run(main())
