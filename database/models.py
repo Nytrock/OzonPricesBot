@@ -2,7 +2,7 @@ from typing import Annotated
 
 from datetime import datetime
 
-from sqlalchemy import String, ForeignKey, DateTime, Column, func
+from sqlalchemy import String, ForeignKey, DateTime, Column
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from .database import Base

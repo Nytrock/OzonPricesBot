@@ -40,7 +40,6 @@ async def create_admin(user_id: int) -> None:
         'id': user_id,
         'have_card': False,
         'show_variations': UserShowVariations.only_cheaper.value,
-        'show_product_image': True,
         'send_notifications': UserSendNotifications.only_lowering.value,
         'is_admin': True
     }

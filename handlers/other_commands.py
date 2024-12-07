@@ -1,10 +1,8 @@
 from aiogram import Router
-from aiogram.filters import CommandStart, Command, StateFilter
-from aiogram.fsm.state import default_state
+from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from aiogram_dialog import DialogManager, StartMode
 
-from dialogs.main_menu import dialog
 from filters.registration import IsUserRegistered
 from states.states import MainMenuDialogStates
 

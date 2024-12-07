@@ -2,7 +2,6 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardBut
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from callback_factory.callback_factory import ProductCallbackFactory
-from database.models import Product
 
 
 def create_reply_kb(i18n: dict[str, str], width: int, *args: str, **kwargs: str) -> ReplyKeyboardMarkup:
