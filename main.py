@@ -1,4 +1,5 @@
 import asyncio
+from aiogram.client.session.aiohttp import AiohttpSession
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -18,8 +19,12 @@ from schedulers import product_updater
 async def main():
     config: Config = load_config()
     storage = MemoryStorage()
+    session = AiohttpSession(proxy='http://proxy.server:3128')
 
-    bot = Bot(token=config.tg_bot.token)
+    bot = Bot(
+        token=config.tg_bot.token,
+        session=session
+    )
     dp = Dispatcher(
         storage=storage,
         translations=LEXICON
