@@ -16,7 +16,7 @@ class CustomMessageManager(MessageManager):
         if media.file_id:
             return await super().get_media_source(media, bot)
         if media.url and media.url.startswith(GRAPH_URL_PREFIX):
-            product_id, product_title, have_card, middleware_data = media.url[len(GRAPH_URL_PREFIX):].split('&')
+            product_id, product_title, have_card, middleware_data = media.url[len(GRAPH_URL_PREFIX):].split('~')
 
             product_id = int(product_id)
             have_card = have_card == 'True'

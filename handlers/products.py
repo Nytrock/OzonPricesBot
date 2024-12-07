@@ -76,9 +76,9 @@ async def add_product_data_to_dialog(user_id: int, product_data: dict[str, Any],
     manager.dialog_data['product'] = product_data
     manager.dialog_data['variations_mode'] = False
     manager.dialog_data['graph_url'] = (f'graph://{product_data["id"]}'
-                                        f'&{product_data["title"]}'
-                                        f'&{manager.middleware_data["user_have_card"]}'
-                                        f'&{manager.middleware_data["i18n"]}')
+                                        f'~{product_data["title"]}'
+                                        f'~{manager.middleware_data["user_have_card"]}'
+                                        f'~{manager.middleware_data["i18n"]}')
     manager.dialog_data['image_url'] = manager.dialog_data['graph_url']
     manager.dialog_data['have_variations'] = bool(product_data['variations'])
     manager.dialog_data['into_favorites'] = await is_favorite_exists(user_id, product_data['id'])
