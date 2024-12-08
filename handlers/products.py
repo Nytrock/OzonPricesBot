@@ -34,8 +34,6 @@ async def product_detail_start(**kwargs) -> dict[str, Any]:
 
 async def search_product(message: Message, _: MessageInput, manager: DialogManager) -> None:
     text = message.text
-    await message.delete()
-
     if text.isdigit():
         product_id = int(text)
     else:
@@ -45,6 +43,7 @@ async def search_product(message: Message, _: MessageInput, manager: DialogManag
         manager.dialog_data['search_query'] = text
         manager.dialog_data['search_page'] = 1
         manager.dialog_data['search_data'] = []
+        await message.delete()
         await get_search_page_data(manager)
         await manager.switch_to(ProductsDialogStates.product_search)
     else:
@@ -52,6 +51,7 @@ async def search_product(message: Message, _: MessageInput, manager: DialogManag
         if product_data == {}:
             await message.answer(manager.middleware_data['i18n']['product_id_error'])
         else:
+            await message.delete()
             await add_product_data_to_dialog(message.from_user.id, product_data, manager)
             await manager.switch_to(ProductsDialogStates.product_detail)
 
