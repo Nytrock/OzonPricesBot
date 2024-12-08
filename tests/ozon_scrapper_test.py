@@ -1,4 +1,5 @@
 import asyncio
+import platform
 
 from exernal_services.ozon_scrapper import get_product_data_from_ozon
 
@@ -13,5 +14,7 @@ async def main():
     print(await get_product_data_from_ozon(9872234))
 
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-asyncio.run(main())
+if __name__ == "__main__":
+    if platform.system() == 'Windows':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.run(main())

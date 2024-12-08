@@ -1,13 +1,17 @@
 import html
 import json
 import textwrap
+from pprint import pprint
 
 from bs4 import BeautifulSoup
 from typing import Any
 from curl_cffi.requests import AsyncSession
+from sqlalchemy.testing import variation
+
 from utils.url_parser import get_product_id_from_inner_url
 
 PRODUCT_URL = 'https://www.ozon.ru/product'
+VARIATIONS_URL = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/modal/aspectsNew?product_id='
 SEARCH_URL = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?page={page_index}&text={text}'
 SEARCH_URL_SPARE = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?page_index={page_index}&text={text}'
 SEARCH_RESULTS_COUNT = 8
@@ -75,20 +79,7 @@ async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
 
     seller_div = product_soup.find(id=lambda value: value and value.startswith('state-webStickyProducts-'))
     result['seller'] = json.loads(seller_div['data-state'])['seller']['name']
-
-    variants_div = product_soup.find(id=lambda value: value and value.startswith('state-webAspects-'))
-    if variants_div is None:
-        result['variations'] = set()
-        return result
-
-    result['variations'] = set()
-    variants_data = json.loads(variants_div['data-state'])
-    for aspect in variants_data['aspects']:
-        for variant in aspect['variants']:
-            variation_id = get_product_id_from_inner_url(variant['link'])
-            if variation_id != product_id:
-                result['variations'].add(variation_id)
-    result['variations'] = list(result['variations'])
+    result['variations'] = await get_variations(product_id)
 
     return result
 
@@ -127,4 +118,26 @@ async def get_search_data(url: str) -> dict[str, Any]:
     for key in data.keys():
         if key.startswith('searchResultsV2') and data[key] != '{}':
             result = json.loads(data[key])
+    return result
+
+async def get_variations(product_id: int) -> list[int]:
+    async with AsyncSession() as s:
+        url = VARIATIONS_URL + str(product_id)
+        response = await s.get(url)
+        data = json.loads(response.text)
+
+    result = []
+    if not data.get('widgetStates'):
+        return result
+
+    data = data['widgetStates']
+    for key in data.keys():
+        if key.startswith('webAspectsModal'):
+            data = json.loads(data[key])['aspects'][0]
+            break
+
+    for variation in data['variants']:
+        if variation['sku'] != product_id:
+            result.append(variation['sku'])
+
     return result
