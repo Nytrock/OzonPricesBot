@@ -32,7 +32,9 @@ async def update_prices(bot: Bot) -> None:
 
         price_data = await get_product_data_from_ozon(product.id)
         await update_product(price_data)
-        if price_data['regular_price'] != last_price.regular_price or price_data['card_price'] != last_price.card_price:
+        if price_data['regular_price'] != last_price.regular_price or \
+                price_data['card_price'] != last_price.card_price or \
+                price_data['in_stock'] != last_price.in_stock:
             price_data['id'] = product.id
             await create_product_price(price_data)
             await notification_users(product, last_price, price_data, bot)
@@ -68,11 +70,22 @@ async def notification_users(product: Product, old_price: Price, new_price: dict
             if language_code not in LEXICON.keys():
                 language_code = LEXICON['default']
 
-        message_text = LEXICON[language_code]['notification'].format(
-            product=product.title,
-            old_price=old_price_num,
-            new_price=new_price_num
-        )
+        if old_price.in_stock != new_price['in_stock']:
+            if new_price['in_stock']:
+                message_text = LEXICON[language_code]['notification_stock_true'].format(
+                    product=product.title
+                )
+            else:
+                message_text = LEXICON[language_code]['notification_stock_false'].format(
+                    product=product.title
+                )
+        else:
+            message_text = LEXICON[language_code]['notification_price'].format(
+                product=product.title,
+                old_price=old_price_num,
+                new_price=new_price_num
+            )
+
         await bot.send_message(
             user.id,
             text=message_text,
