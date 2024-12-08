@@ -30,7 +30,7 @@ async def get_price_graph(product_id: int, product_title: str, have_card: bool, 
         if not prices[i].in_stock:
             color = 'gray'
         else:
-            color = 'blue'
+            color = 'green'
 
         if all_y:
             all_y.pop(-1)
@@ -52,7 +52,7 @@ async def get_price_graph(product_id: int, product_title: str, have_card: bool, 
         if not price.in_stock:
             color = 'gray'
         else:
-            color = 'blue'
+            color = 'green'
 
         all_y.extend(y)
         plt.plot(x, y, color=color, label=i18n[f'graph_{color}'])

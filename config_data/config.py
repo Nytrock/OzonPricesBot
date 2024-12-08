@@ -41,6 +41,6 @@ def load_config(path: str | None = None) -> Config:
         ),
         db=Database(
             name=env('BD_NAME'),
-            echo=bool(env('BD_ECHO'))
+            echo=env.bool('BD_ECHO', False)
         )
     )

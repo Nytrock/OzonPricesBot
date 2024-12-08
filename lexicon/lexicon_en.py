@@ -67,7 +67,7 @@ LEXICON_EN: dict[str, str] = {
     'favorites_empty': 'You have no products in favorites.',
     'notification': '🔔 Price on product {product} changed from {old_price} rub to {new_price} rub!',
     'notification_button': 'Open product page',
-    'graph_blue': 'In stock',
+    'graph_green': 'In stock',
     'graph_gray': 'Out of stock',
     'cancel': '❌ Cancel',
     'close': '❌ Close',
