@@ -14,7 +14,7 @@ async def get_price_graph(product_id: int, product_title: str, have_card: bool, 
 
     plt.style.use('dark_background')
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d.%m.%Y'))
-    plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=2))
+    plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=1))
 
     plt.title(product_title, fontsize=7, y=1.04)
 
@@ -38,24 +38,18 @@ async def get_price_graph(product_id: int, product_title: str, have_card: bool, 
 
         plt.plot(x, y, color=color, label=i18n[f'graph_{color}'])
 
-    if len(prices) == 1:
-        price = prices[0]
-        plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=1))
-
-        x = [price.datetime - datetime.timedelta(days=1), price.datetime]
-
-        if have_card:
-            y = [price.card_price, price.card_price]
-        else:
-            y = [price.regular_price, price.regular_price]
-
-        if not price.in_stock:
-            color = 'gray'
-        else:
-            color = 'green'
-
-        all_y.extend(y)
-        plt.plot(x, y, color=color, label=i18n[f'graph_{color}'])
+    price = prices[0]
+    x = [price.datetime, datetime.datetime.now()]
+    if have_card:
+        y = [price.card_price, price.card_price]
+    else:
+        y = [price.regular_price, price.regular_price]
+    if not price.in_stock:
+        color = 'gray'
+    else:
+        color = 'green'
+    all_y.extend(y)
+    plt.plot(x, y, color=color, label=i18n[f'graph_{color}'])
 
     all_y_labels = [f'{y} {i18n["rub"]}' for y in all_y]
     plt.yticks(all_y, all_y_labels)
