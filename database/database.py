@@ -18,5 +18,5 @@ class Base(DeclarativeBase):
 
 async def create_tables() -> None:
     async with engine.begin() as conn:
-        from .models import User, Product, Price, Favorite
+        from .models import User, Product, Price, Favorite, ProductGroup, Seller
         await conn.run_sync(Base.metadata.create_all)

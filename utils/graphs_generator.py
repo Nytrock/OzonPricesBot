@@ -38,7 +38,7 @@ async def get_price_graph(product_id: int, product_title: str, have_card: bool, 
 
         plt.plot(x, y, color=color, label=i18n[f'graph_{color}'])
 
-    price = prices[0]
+    price = prices[-1]
     x = [price.datetime, datetime.datetime.now()]
     if have_card:
         y = [price.card_price, price.card_price]
