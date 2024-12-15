@@ -50,7 +50,7 @@ class Price(Base):
 
     id: Mapped[pk]
     product: Mapped[int] = mapped_column(ForeignKey('product.id', ondelete='CASCADE'))
-    datetime = Column(DateTime(timezone=True), default=datetime.now())
+    datetime = Column(DateTime(timezone=True), default=datetime.now)
     card_price: Mapped[int]
     regular_price: Mapped[int]
     in_stock: Mapped[bool]
