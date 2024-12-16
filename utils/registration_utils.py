@@ -3,9 +3,12 @@ from aiogram.types import Message
 from enums.user_data import UserShowVariations, UserSendNotifications
 
 
+# Преобразование ответа пользователя в bool
 def is_message_yes(message: Message, i18n: dict[str, str]) -> bool:
     return message.text.lower() == i18n.get('yes').lower()
 
+
+# Преобразование ответа пользователя в UserShowVariations
 def message_to_variations_enum(message: Message, i18n: dict[str, str]) -> int:
     text = message.text.lower()
     if text == i18n.get('registration_variation_all').lower():
@@ -14,6 +17,7 @@ def message_to_variations_enum(message: Message, i18n: dict[str, str]) -> int:
         return UserShowVariations.only_cheaper.value
 
 
+# Преобразование ответа пользователя в UserSendNotifications
 def message_to_notifications_enum(message: Message, i18n: dict[str, str]) -> int:
     text = message.text.lower()
     if text == i18n.get('yes').lower():

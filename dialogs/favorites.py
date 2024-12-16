@@ -7,6 +7,7 @@ from handlers.favorites import get_favorites, previous_favorites, next_favorites
 from states.states import FavoritesDialogStates
 from utils.dialog import Translate, CustomListGroup
 
+# Окно избранного
 favorites_show = Window(
     Translate('favorites_show'),
     CustomListGroup(
@@ -61,6 +62,7 @@ favorites_show = Window(
 )
 
 
+# Окно редактирования избранного
 favorites_edit = Window(
     Translate('favorites_edit'),
     CustomListGroup(

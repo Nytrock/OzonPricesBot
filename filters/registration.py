@@ -4,6 +4,7 @@ from aiogram.types import Message
 from enums.user_data import UserRole
 
 
+# Фильтр для вариантов ответа при регистрации
 class RegistrationFilter(BaseFilter):
     def __init__(self, possible_replies: list[str] = None) -> None:
         self.possible_replies = possible_replies
@@ -15,6 +16,7 @@ class RegistrationFilter(BaseFilter):
         return False
 
 
+# Фильтр, проверяющий, зарегистрирован ли пользователь
 class IsUserRegistered(BaseFilter):
     async def __call__(self, message: Message, user_role: UserRole) -> bool:
         return user_role != UserRole.none

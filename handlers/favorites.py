@@ -9,9 +9,10 @@ from database.methods import get_user_favorites, get_product_info, remove_favori
 from handlers.products import add_product_data_to_dialog
 from states.states import ProductsDialogStates
 
-FAVORITES_ROWS_COUNT = 2
+FAVORITES_ROWS_COUNT = 5
 
 
+# Получение избранных товаров пользователя
 async def get_favorites(**kwargs) -> dict[str, Any]:
     manager = kwargs['dialog_manager']
     user_id = manager.event.from_user.id
@@ -29,14 +30,17 @@ async def get_favorites(**kwargs) -> dict[str, Any]:
     return {'favorites': favorites}
 
 
+# Переключение на прошлую страницу избранного
 async def previous_favorites(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['page_num'] -= 1
 
 
+# Переключение на следующую страницу избранного
 async def next_favorites(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['page_num'] += 1
 
 
+# Открытие избранного товара
 async def open_favorite_product(callback: CallbackQuery, _: Button, manager: DialogManager) -> None:
     product_id = int(callback.item_id)
     product_data = await get_product_info(product_id)
@@ -45,6 +49,7 @@ async def open_favorite_product(callback: CallbackQuery, _: Button, manager: Dia
     await manager.start(ProductsDialogStates.product_detail, data=manager.dialog_data)
 
 
+# Удаление избранного товара
 async def remove_favorite_product(callback: CallbackQuery, _: Button, manager: DialogManager) -> None:
     product_id = int(callback.item_id)
     user_id = manager.event.from_user.id

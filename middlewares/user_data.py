@@ -7,6 +7,7 @@ from database.methods import get_user
 from enums.user_data import UserRole
 
 
+# Миддлварь для получения информации о пользователе
 class UserDataMiddleware(BaseMiddleware):
     async def __call__(
             self,

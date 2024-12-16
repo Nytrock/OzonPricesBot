@@ -4,6 +4,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from callback_factory.callback_factory import ProductCallbackFactory
 
 
+# Создание обычной клаыиатуры
 def create_reply_kb(i18n: dict[str, str], width: int, *args: str, **kwargs: str) -> ReplyKeyboardMarkup:
     kb_builder = ReplyKeyboardBuilder()
     buttons: list[KeyboardButton] = []
@@ -24,6 +25,8 @@ def create_reply_kb(i18n: dict[str, str], width: int, *args: str, **kwargs: str)
         resize_keyboard=True,
     )
 
+
+# Создание клавиатуры для уведомления
 def create_notification_kb(product_id: int,  i18n: dict[str, str]):
     kb_builder = InlineKeyboardBuilder()
 

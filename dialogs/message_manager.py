@@ -11,7 +11,9 @@ from utils.graphs_generator import get_price_graph
 GRAPH_URL_PREFIX = 'graph://'
 
 
+# Кастомный менеджер
 class CustomMessageManager(MessageManager):
+    # Получение медиа данных
     async def get_media_source(self, media: MediaAttachment, bot: Bot) -> Union[InputFile, str]:
         if media.file_id:
             return await super().get_media_source(media, bot)

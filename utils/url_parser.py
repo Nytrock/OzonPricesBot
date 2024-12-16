@@ -1,3 +1,4 @@
+# Получение id продукта через ссылку
 def get_product_id_from_url(url: str) -> int:
     if 'ozon.ru/product/' not in url:
         return -1
@@ -9,5 +10,7 @@ def get_product_id_from_url(url: str) -> int:
 
     return -1
 
+
+# Получение id продукта через внутреннюю ссылку
 def get_product_id_from_inner_url(url: str) -> int:
     return get_product_id_from_url('ozon.ru' + url)

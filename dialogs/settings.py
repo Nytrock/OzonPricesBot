@@ -8,6 +8,7 @@ from handlers.settings import update_user_have_card, update_user_show_variations
 from states.states import SettingsDialogStates
 from utils.dialog import Translate, create_enum_select
 
+# Окно настроек
 all_settings = Window(
     Translate('settings_all'),
     Row(
@@ -32,6 +33,7 @@ all_settings = Window(
 )
 
 
+# Окно настройки карты
 have_card = Window(
     Translate('have_card_description'),
     Button(
@@ -63,6 +65,7 @@ have_card = Window(
 )
 
 
+# Окно настройки отображения вариантов
 show_variations = Window(
     Translate('show_variations_description'),
     *create_enum_select(UserShowVariations, 'user_show_variations', update_user_show_variations),
@@ -75,6 +78,7 @@ show_variations = Window(
 )
 
 
+# Окно настройки отправки уведомлений
 send_notifications = Window(
     Translate('send_notifications_description'),
     *create_enum_select(UserSendNotifications, 'user_send_notifications', update_user_send_notifications),

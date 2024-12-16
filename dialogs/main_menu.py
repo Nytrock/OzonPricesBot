@@ -9,6 +9,7 @@ from aiogram_dialog.widgets.text import Format, Const, Multi
 from utils.dialog import Translate
 
 
+# Окно главного меню
 main_menu = Window(
     Translate('main_menu_hello'),
     Multi(
@@ -55,6 +56,7 @@ main_menu = Window(
 )
 
 
+# Окно о боте
 about = Window(
     Translate('about'),
     Back(

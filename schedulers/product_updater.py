@@ -15,12 +15,14 @@ from keyboards.keyboard_utils import create_notification_kb
 from lexicon.lexicon import LEXICON
 
 
+# Запуск планировщика
 def setup_scheduler(bot: Bot) -> None:
     scheduler = AsyncIOScheduler()
     scheduler.add_job(update_prices, IntervalTrigger(hours=6), args=(bot,))
     scheduler.start()
 
 
+# Обновление цен
 async def update_prices(bot: Bot) -> None:
     products = await get_all_products_with_users_favorite()
     if len(products) == 0:
@@ -40,6 +42,7 @@ async def update_prices(bot: Bot) -> None:
             await notification_users(product, last_price, price_data, bot)
 
 
+# Отправка уведомлений
 async def notification_users(product: Product, old_price: Price, new_price: dict[str, Any], bot: Bot):
     for user in product.users_favorite:
         if user.have_card:

@@ -8,6 +8,7 @@ from database.database import session_factory
 from database.models import Favorite, User
 
 
+# Добавление (или удаление) продукта из избранного
 async def change_favorite(user_id: int, product_id: int) -> bool:
     async with session_factory() as session:
         favorite_exists = await is_favorite_exists(user_id, product_id)
@@ -22,6 +23,7 @@ async def change_favorite(user_id: int, product_id: int) -> bool:
         return not favorite_exists
 
 
+# Есть ли товар в избранном
 async def is_favorite_exists(user_id: int, product_id: int) -> bool:
     async with session_factory() as session:
         query = select(Favorite).filter(Favorite.user == user_id, Favorite.product == product_id)
@@ -34,6 +36,7 @@ async def is_favorite_exists(user_id: int, product_id: int) -> bool:
             return False
 
 
+# Получение избранного пользователя
 async def get_user_favorites(user_id: int) -> list[dict[str, Any]]:
     async with session_factory() as session:
         query = select(User).filter(User.id == user_id).options(selectinload(User.favorite_products))
@@ -50,6 +53,7 @@ async def get_user_favorites(user_id: int) -> list[dict[str, Any]]:
         return result
 
 
+# Удаление избранного
 async def remove_favorite(user_id: int, product_id: int) -> None:
     async with session_factory() as session:
         query = delete(Favorite).where(Favorite.user == user_id, Favorite.product == product_id)

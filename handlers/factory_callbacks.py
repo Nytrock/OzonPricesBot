@@ -11,6 +11,8 @@ from states.states import MainMenuDialogStates, ProductsDialogStates
 router = Router()
 router.message.filter(IsUserRegistered())
 
+
+# хэндлер при нажатии на кнопку из уведомления
 @router.callback_query(ProductCallbackFactory.filter())
 async def notification_open(callback: CallbackQuery, callback_data: ProductCallbackFactory, dialog_manager: DialogManager):
     await dialog_manager.start(MainMenuDialogStates.main_menu, mode=StartMode.RESET_STACK)

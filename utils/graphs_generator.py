@@ -8,6 +8,7 @@ import matplotlib.dates as mdates
 from database.methods import get_product_prices
 
 
+# Генерация графа изменения цены
 async def get_price_graph(product_id: int, product_title: str, have_card: bool, i18n: dict[str, Any]) -> bytes:
     prices = await get_product_prices(product_id)
     plt.clf()

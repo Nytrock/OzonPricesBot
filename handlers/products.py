@@ -16,6 +16,7 @@ from utils.url_parser import get_product_id_from_url
 VARIATIONS_ROWS_COUNT = 6
 
 
+# Получение информации о продукте на запуске
 async def product_detail_start(**kwargs) -> dict[str, Any]:
     manager = kwargs['dialog_manager']
     if manager.start_data:
@@ -32,6 +33,7 @@ async def product_detail_start(**kwargs) -> dict[str, Any]:
     return {'variations_limit': variations_limit}
 
 
+# Обработка сообщения пользователя в режиме поиска продукта
 async def search_product(message: Message, _: MessageInput, manager: DialogManager) -> None:
     text = message.text
     if text.isdigit():
@@ -56,6 +58,7 @@ async def search_product(message: Message, _: MessageInput, manager: DialogManag
             await manager.switch_to(ProductsDialogStates.product_detail)
 
 
+# Изменение режима отображения вариаций
 async def change_variations_mode(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['variations_mode'] = not manager.dialog_data['variations_mode']
     manager.dialog_data['page_num'] = 1
@@ -64,6 +67,7 @@ async def change_variations_mode(_0: CallbackQuery, _1: Button, manager: DialogM
     )
 
 
+# Смена странички продукта
 async def change_product(callback: CallbackQuery, _: Button, manager: DialogManager) -> None:
     product_id = int(callback.item_id)
     product_data = await get_product_info(product_id)
@@ -71,6 +75,7 @@ async def change_product(callback: CallbackQuery, _: Button, manager: DialogMana
     await manager.switch_to(ProductsDialogStates.product_detail)
 
 
+# Добавление информации о продукте в диалог
 async def add_product_data_to_dialog(user_id: int, product_data: dict[str, Any], manager: DialogManager) -> None:
     await limit_product_data_variations(product_data, manager)
     manager.dialog_data['product'] = product_data
@@ -84,6 +89,7 @@ async def add_product_data_to_dialog(user_id: int, product_data: dict[str, Any],
     manager.dialog_data['into_favorites'] = await is_favorite_exists(user_id, product_data['id'])
 
 
+# Ограничение списка вариаций продукта
 async def limit_product_data_variations(product_data: dict[str, Any], manager: DialogManager) -> None:
     user_have_card = manager.middleware_data['user_have_card']
     user_show_variations = manager.middleware_data['user_show_variations']
@@ -101,6 +107,7 @@ async def limit_product_data_variations(product_data: dict[str, Any], manager: D
     product_data['variations'] = limit_variations
 
 
+# Изменение картинки окна товара
 async def change_image_url(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     if manager.dialog_data['image_url'] == manager.dialog_data['graph_url']:
         manager.dialog_data['image_url'] = manager.dialog_data['product']['image']
@@ -108,16 +115,19 @@ async def change_image_url(_0: CallbackQuery, _1: Button, manager: DialogManager
         manager.dialog_data['image_url'] = manager.dialog_data['graph_url']
 
 
+# Переключение на следующую страницу поиска
 async def next_search_page(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['search_page'] += 1
     await get_search_page_data(manager)
 
 
+# Переключение на прошлую страницу поиска
 async def previous_search_page(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['search_page'] -= 1
     await get_search_page_data(manager)
 
 
+# Обновление информации о поиске
 async def get_search_page_data(manager: DialogManager) -> None:
     page_num = manager.dialog_data['search_page']
     query = manager.dialog_data['search_query']
@@ -132,6 +142,7 @@ async def get_search_page_data(manager: DialogManager) -> None:
         manager.dialog_data['have_search_result'] = True
 
 
+# Изменение состояния избранного продукта
 async def change_product_favorite(callback: CallbackQuery, _: Button, manager: DialogManager) -> None:
     product_id = manager.dialog_data['product']['id']
     user_id = callback.from_user.id
@@ -140,9 +151,11 @@ async def change_product_favorite(callback: CallbackQuery, _: Button, manager: D
     manager.dialog_data['into_favorites'] = favorite_created
 
 
+# Переключение на предыдущую страницу поиска
 async def previous_variations(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['page_num'] -= 1
 
 
+# Переключение на следующую страницу поиска
 async def next_variations(_0: CallbackQuery, _1: Button, manager: DialogManager) -> None:
     manager.dialog_data['page_num'] += 1

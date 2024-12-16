@@ -6,6 +6,7 @@ from database.database import session_factory
 from database.models import Price
 
 
+# Создание цены
 async def create_product_price(product_data: dict[str, Any]) -> None:
     async with session_factory() as session:
         query = insert(Price).values(
@@ -18,6 +19,7 @@ async def create_product_price(product_data: dict[str, Any]) -> None:
         await session.commit()
 
 
+# Получение цен продукта
 async def get_product_prices(product_id: int) -> list[Price]:
     async with session_factory() as session:
         query = select(Price).filter(Price.product == product_id).order_by(Price.datetime)

@@ -4,6 +4,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, User
 
 
+# Миддварь для получения языка пользователя
 class TranslatorMiddleware(BaseMiddleware):
     async def __call__(
         self,

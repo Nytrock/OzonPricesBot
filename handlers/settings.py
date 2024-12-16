@@ -5,6 +5,7 @@ from aiogram_dialog.widgets.kbd import Button
 from database.methods import update_have_card, update_show_variations, update_send_notifications
 
 
+# Обновление настройки карты
 async def update_user_have_card(_: CallbackQuery, button: Button, manager: DialogManager) -> None:
     user_id = manager.event.from_user.id
     have_card = button.widget_id == 'on'
@@ -12,6 +13,7 @@ async def update_user_have_card(_: CallbackQuery, button: Button, manager: Dialo
     await update_have_card(user_id, have_card)
 
 
+# Обновление настройки отображения вариантов
 async def update_user_show_variations(_: CallbackQuery, button: Button, manager: DialogManager) -> None:
     user_id = manager.event.from_user.id
     show_variations = int(button.widget_id)
@@ -19,6 +21,7 @@ async def update_user_show_variations(_: CallbackQuery, button: Button, manager:
     await update_show_variations(user_id, show_variations)
 
 
+# Обновление настройки отправки уведомлений
 async def update_user_send_notifications(_: CallbackQuery, button: Button, manager: DialogManager) -> None:
     user_id = manager.event.from_user.id
     send_notifications = int(button.widget_id)

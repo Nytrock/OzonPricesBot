@@ -1,24 +1,25 @@
 import html
 import json
 import textwrap
-from pprint import pprint
 
 from bs4 import BeautifulSoup
 from typing import Any
 from curl_cffi.requests import AsyncSession
-from sqlalchemy.testing import variation
 
 from utils.url_parser import get_product_id_from_inner_url
 
+# Константы
 PRODUCT_URL = 'https://www.ozon.ru/product'
 VARIATIONS_URL = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/modal/aspectsNew?product_id='
 SEARCH_URL = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?page={page_index}&text={text}'
 SEARCH_URL_SPARE = 'https://www.ozon.ru/api/entrypoint-api.bx/page/json/v2?url=/search/?page_index={page_index}&text={text}'
 SEARCH_RESULTS_COUNT = 8
 
+# Символы для очищения информации о цене
 PRICE_SYMBOLS = [' ', '₽']
 
 
+# Получение супа страницы по ссылке
 async def get_page_soup(url: str) -> BeautifulSoup:
     async with AsyncSession() as s:
         response = await s.get(url)
@@ -26,6 +27,7 @@ async def get_page_soup(url: str) -> BeautifulSoup:
         return soup
 
 
+# Получение цен на товар и проверка его существования
 async def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str, int]:
     result = {'regular_price': -1, 'card_price': -1}
     price_div = product_soup.find(attrs={'data-widget' : 'webPrice'})
@@ -55,6 +57,7 @@ async def get_product_prices_from_soup(product_soup: BeautifulSoup) -> dict[str,
     return result
 
 
+# Получение всей информации о продукте
 async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
     result = {'id': product_id}
     product_soup = await get_page_soup(f'{PRODUCT_URL}/{product_id}/?oos_search=false')
@@ -83,6 +86,8 @@ async def get_product_data_from_ozon(product_id: int) -> dict[str, Any]:
 
     return result
 
+
+# Получение и обработка результатов поиска
 async def get_products_by_search(text: str, page_index=1) -> list[dict[str, Any]]:
     url = SEARCH_URL.format(text=text, page_index=page_index)
     data = await get_search_data(url)
@@ -109,6 +114,7 @@ async def get_products_by_search(text: str, page_index=1) -> list[dict[str, Any]
     return result
 
 
+# Получение результатов поиска
 async def get_search_data(url: str) -> dict[str, Any]:
     async with AsyncSession() as s:
         response = await s.get(url)
@@ -120,6 +126,8 @@ async def get_search_data(url: str) -> dict[str, Any]:
             result = json.loads(data[key])
     return result
 
+
+# Получение вариаций товара
 async def get_variations(product_id: int) -> list[int]:
     async with AsyncSession() as s:
         url = VARIATIONS_URL + str(product_id)

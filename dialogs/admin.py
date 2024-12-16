@@ -7,6 +7,7 @@ from handlers.admin import get_admin_statistic, add_new_admin
 from states.states import AdminDialogStates
 from utils.dialog import Translate
 
+# Окно статистики
 statistic = Window(
     Translate('statistics_users'),
     Translate('statistics_products'),
@@ -17,6 +18,7 @@ statistic = Window(
 )
 
 
+# Окно добавления админа
 add_admin = Window(
     Translate('add_admin'),
     MessageInput(add_new_admin, content_types=[ContentType.TEXT]),

@@ -16,6 +16,7 @@ router = Router()
 router.message.filter(~IsUserRegistered())
 
 
+# Команда start для незарегистрированных пользователей
 @router.message(CommandStart(), StateFilter(default_state))
 async def registration_start_message(message: Message, i18n: dict[str, str]):
     await message.answer(
@@ -23,6 +24,7 @@ async def registration_start_message(message: Message, i18n: dict[str, str]):
     )
 
 
+# Начало регистрации
 @router.message(Command('registrate'), StateFilter(default_state))
 async def registration_command_message(message: Message, i18n: dict[str, str], state: FSMContext):
     await message.answer(text=i18n.get('registration_command'))
@@ -36,6 +38,7 @@ async def registration_command_message(message: Message, i18n: dict[str, str], s
     await state.set_state(RegistrationStates.fill_have_card)
 
 
+# Ошибка сообщения у незарегистрированных пользователей
 @router.message(StateFilter(default_state))
 async def registration_error_message(message: Message, i18n: dict[str, str]):
     await message.answer(
@@ -43,6 +46,7 @@ async def registration_error_message(message: Message, i18n: dict[str, str]):
     )
 
 
+# Получение ответа на вопрос о карте
 @router.message(StateFilter(RegistrationStates.fill_have_card),
                 RegistrationFilter(possible_replies=['yes', 'no']))
 async def registration_card_success(message: Message, i18n: dict[str, str], state: FSMContext):
@@ -55,6 +59,7 @@ async def registration_card_success(message: Message, i18n: dict[str, str], stat
     await state.set_state(RegistrationStates.fill_show_variations)
 
 
+# Ошибка ответа на вопрос о карте
 @router.message(StateFilter(RegistrationStates.fill_have_card))
 async def registration_card_error(message: Message, i18n: dict[str, str]):
     await message.answer(
@@ -63,6 +68,7 @@ async def registration_card_error(message: Message, i18n: dict[str, str]):
     )
 
 
+# Получение ответа на вопрос о вариациях
 @router.message(StateFilter(RegistrationStates.fill_show_variations),
                 RegistrationFilter(possible_replies=['UserShowVariations.all', 'UserShowVariations.only_cheaper']))
 async def registration_variations_success(message: Message, i18n: dict[str, str], state: FSMContext):
@@ -75,6 +81,7 @@ async def registration_variations_success(message: Message, i18n: dict[str, str]
     await state.set_state(RegistrationStates.fill_send_notifications)
 
 
+# Ошибка ответа на вопрос о вариациях
 @router.message(StateFilter(RegistrationStates.fill_show_variations))
 async def registration_variations_error(message: Message, i18n: dict[str, str]):
     await message.answer(
@@ -83,6 +90,7 @@ async def registration_variations_error(message: Message, i18n: dict[str, str]):
     )
 
 
+# Получение ответа на вопрос об отправке уведомлений
 @router.message(StateFilter(RegistrationStates.fill_send_notifications),
                 RegistrationFilter(possible_replies=['yes', 'no', 'UserSendNotifications.only_lowering']))
 async def registration_image_success(message: Message, i18n: dict[str, str], state: FSMContext, dialog_manager: DialogManager):
@@ -99,6 +107,7 @@ async def registration_image_success(message: Message, i18n: dict[str, str], sta
     await start_main_menu(message, dialog_manager)
 
 
+# Ошибка ответа на вопрос об отправке уведомлений
 @router.message(StateFilter(RegistrationStates.fill_send_notifications))
 async def registration_image_error(message: Message, i18n: dict[str, str]):
     await message.answer(

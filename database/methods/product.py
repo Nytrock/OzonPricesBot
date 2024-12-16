@@ -10,6 +10,7 @@ from ..database import session_factory
 from ..models import Product, Seller, ProductGroup, Price
 
 
+# Получение всех продуктов
 async def get_all_products() -> list[Product]:
     async with session_factory() as session:
         query = select(Product)
@@ -17,6 +18,7 @@ async def get_all_products() -> list[Product]:
         return result.scalars().all()
 
 
+# Получение всех продуктов с пользователями, у которых товары в избранном
 async def get_all_products_with_users_favorite() -> list[Product]:
     async with session_factory() as session:
         query = select(Product).options(selectinload(Product.users_favorite))
@@ -24,6 +26,7 @@ async def get_all_products_with_users_favorite() -> list[Product]:
         return result.scalars().all()
 
 
+# Получение всех продавцов
 async def get_all_sellers() -> list[Seller]:
     async with session_factory() as session:
         query = select(Seller)
@@ -31,12 +34,14 @@ async def get_all_sellers() -> list[Seller]:
         return result.all()
 
 
+# Получение информации о продукте
 async def get_product_info(product_id: int) -> dict[str, Any]:
     async with session_factory() as session:
         product = await session.get(Product, product_id)
         if product is not None:
             return await get_data_from_product(product)
 
+        # Получение товара из парсера, если в БД его нет
         product_data = await get_product_data_from_ozon(product_id)
         if product_data == {}:
             return {}
@@ -45,6 +50,7 @@ async def get_product_info(product_id: int) -> dict[str, Any]:
             return product_data
 
 
+# Обновление продукта
 async def update_product(product_data: dict[str, Any]):
     async with session_factory() as session:
         product = await session.get(Product, product_data['id'])
@@ -55,6 +61,7 @@ async def update_product(product_data: dict[str, Any]):
         await session.commit()
 
 
+# Получение информации о продукте в виде словаря
 async def get_data_from_product(product: Product) -> dict[str, Any]:
     product_data = {
         'id': product.id,
@@ -94,6 +101,7 @@ async def get_data_from_product(product: Product) -> dict[str, Any]:
     return product_data
 
 
+# Создание продукта из информации из парсера
 async def create_product(product_data: dict[str, Any]) -> None:
     async with session_factory() as session:
         variations = list(product_data.pop('variations'))
@@ -143,6 +151,7 @@ async def create_product(product_data: dict[str, Any]) -> None:
         await session.commit()
 
 
+# Создание продавца
 async def create_seller(seller_name: str) -> None:
     async with session_factory() as session:
         query = insert(Seller).values(name=seller_name)
@@ -150,6 +159,7 @@ async def create_seller(seller_name: str) -> None:
         await session.commit()
 
 
+# Создание продукта
 async def create_product_group(group_id: int) -> None:
     async with session_factory() as session:
         query = insert(ProductGroup).values(id=group_id)

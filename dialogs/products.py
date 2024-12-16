@@ -10,6 +10,7 @@ from handlers.products import search_product, change_variations_mode, change_pro
 from states.states import ProductsDialogStates
 from utils.dialog import Translate, CustomListGroup
 
+# Окно поиска продукта
 product_search = Window(
     Translate('product_get_id'),
     MessageInput(search_product, content_types=[ContentType.TEXT]),
@@ -18,6 +19,7 @@ product_search = Window(
 )
 
 
+# Окно списка продуктов в поиске
 product_search_list = Window(
     Translate(
         'product_search',
@@ -63,6 +65,7 @@ product_search_list = Window(
 )
 
 
+# Окно информации о продукте
 product_detail = Window(
     StaticMedia(
         url=Format('{dialog_data[image_url]}'),

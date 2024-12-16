@@ -9,6 +9,7 @@ from aiogram_dialog.widgets.text import Format, Multi, Const, Text
 from aiogram_dialog.widgets.text.format import _FormatDataStub
 
 
+# Виджет для перевода текста
 class Translate(Format):
     def __init__(self, text: str, when: WhenCondition = None):
         super().__init__(when=when, text='{middleware_data[i18n][' + text + ']}')
@@ -19,6 +20,7 @@ class Translate(Format):
         return self.text.format_map(data).format_map(data)
 
 
+# Создание селекта на основе enum
 def create_enum_select(enum_type, middleware_param: str, on_click: Callable) -> list[Button]:
     result = []
     for enum in enum_type:
@@ -43,6 +45,7 @@ def create_enum_select(enum_type, middleware_param: str, on_click: Callable) -> 
     return result
 
 
+# Кастомный список, сохраняющий id предмета
 class CustomListGroup(ListGroup):
     async def _process_item_callback(self, callback: CallbackQuery, data: str,
                                      dialog: DialogProtocol, manager: DialogManager) -> bool:

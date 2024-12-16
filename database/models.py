@@ -7,9 +7,11 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from .database import Base
 
+# Шаблон для поля первичного ключа
 pk = Annotated[int, mapped_column(primary_key=True)]
 
 
+# Модель пользователя
 class User(Base):
     __tablename__ = 'user'
 
@@ -25,6 +27,7 @@ class User(Base):
     )
 
 
+# Модель товара
 class Product(Base):
     __tablename__ = 'product'
 
@@ -45,6 +48,7 @@ class Product(Base):
     seller: Mapped['Seller'] = relationship(lazy='joined')
 
 
+# Модель обновления цены на товар
 class Price(Base):
     __tablename__ = 'price'
 
@@ -56,6 +60,7 @@ class Price(Base):
     in_stock: Mapped[bool]
 
 
+# Модель избранного
 class Favorite(Base):
     __tablename__ = 'favorite'
 
@@ -64,11 +69,14 @@ class Favorite(Base):
     product: Mapped[int] = mapped_column(ForeignKey('product.id', ondelete='CASCADE'))
 
 
+# Модель группы товаров (для удобного получения вариаций)
 class ProductGroup(Base):
     __tablename__ = 'product_group'
 
     id: Mapped[pk]
 
+
+# Модель продавца
 class Seller(Base):
     __tablename__ = 'seller'
 
