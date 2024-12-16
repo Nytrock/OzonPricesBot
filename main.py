@@ -16,6 +16,7 @@ from middlewares.user_data import UserDataMiddleware
 from schedulers import product_updater
 
 
+# Запуск приложения
 async def main():
     config: Config = load_config()
     storage = MemoryStorage()
@@ -30,13 +31,16 @@ async def main():
 
     await create_tables()
 
+    # Добавление роутеров
     dp.include_router(registration.router)
     dp.include_router(other_commands.router)
     dp.include_router(factory_callbacks.router)
 
+    # Добавление миддлварей
     dp.update.outer_middleware(UserDataMiddleware())
     dp.update.middleware(TranslatorMiddleware())
 
+    # Добавление диалогов
     dp.include_router(main_menu.dialog)
     dp.include_router(admin.dialog)
     dp.include_router(settings.dialog)
