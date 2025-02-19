@@ -1,9 +1,12 @@
 <p align="center"><img src="OzonPrices.png" alt="Logo" width="256"></p>
 
-## Краткое описание
+# ❗ Attention❗ 
+Ozon has increased the level of security on its website, causing this bot to no longer function. Since this application was a university project, I do not plan to attempt to fix it. In short: THE BOT DOES NOT WORK
+
+## Shorn description
 A Telegram bot that allows tracking price changes for products on Ozon. Search by name `@ozonWatcherBot`
 
-## Установка
+## Installation
 > Python 3.10+ is required for the application to work
 - Clone the repository into your environment
 	```shell
