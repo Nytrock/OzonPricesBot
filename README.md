@@ -3,7 +3,7 @@
 # ❗ Attention❗ 
 Ozon has increased the level of security on its website, causing this bot to no longer function. Since this application was a university project, I do not plan to attempt to fix it. In short: THE BOT DOES NOT WORK
 
-## Shorn description
+## Short description
 A Telegram bot that allows tracking price changes for products on Ozon. Search by name `@ozonWatcherBot`
 
 ## Installation
